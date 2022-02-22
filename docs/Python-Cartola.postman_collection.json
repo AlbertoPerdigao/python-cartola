@@ -1,0 +1,1032 @@
+{
+	"info": {
+		"_postman_id": "353bd5fc-0691-4587-9ebb-13469dcce7ae",
+		"name": "Python-Cartola",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "team",
+			"item": [
+				{
+					"name": "/teams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/teams",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"teams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/team/<id>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/team/20",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"team",
+								"20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/team/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \r\n    \"name\": \"TESTE\",\r\n    \"active\": true,\r\n    \"slug\": \"perdicartola-fbpa\",\r\n    \"id_tag\": \"189453\",\r\n    \"url_escudo_png\": \"https://s2.glbimg.com/D2BjIaq_nriJOo82prUmw-DHtG4=/https://s3.glbimg.com/v1/AUTH_58d78b787ec34892b5aaa0c7a146155f/cartola_svg_185/escudo/f6/50/26/00151931e3-86f4-49ed-b201-bd9416a02af620210429105026\",\r\n    \"player_name\": \"Alberto Perdigão\"    \r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/team/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"team",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/team/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"active\": false,\r\n    \"name\": \"TESTE 2\"\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/team/30",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"team",
+								"30"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/team/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/team/30",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"team",
+								"30"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "month",
+			"item": [
+				{
+					"name": "/months/<year>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/months/2022",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"months",
+								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/month/<id>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/month/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"month",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/month/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \r\n    \"name\": \"novembro\",\r\n    \"year\": 2022,\r\n    \"tax\": 30.00\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/month/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"month",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/month/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"name\": \"novembro\",\r\n    \"year\": 2022,\r\n    \"tax\": 30.00\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/month/8",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"month",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/month/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/month/9",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"month",
+								"9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "round",
+			"item": [
+				{
+					"name": "/rounds/<year>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/rounds/2022",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"rounds",
+								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/round/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/round/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"round",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/round/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \r\n    \"months_id\": 8,\r\n    \"round_number\": 38,\r\n    \"awarded\": true\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/round/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"round",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/round/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"months_id\": 7,\r\n    \"awarded\": true\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/round/42",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"round",
+								"42"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/round/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/round/40",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"round",
+								"40"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payment",
+			"item": [
+				{
+					"name": "/payments/<year>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/payments/2022",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"payments",
+								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/payment/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/payment/3",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"payment",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/payment/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"teams_id\": 26,\r\n    \"months_id\": 4,\r\n    \"amount\": 30.00\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/payment/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"payment",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/payment/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"amount\": 10.00\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/payment/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"payment",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/payment/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/payment/7",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"payment",
+								"7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "prize",
+			"item": [
+				{
+					"name": "/prizes/<year>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/prizes/2022",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"prizes",
+								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/prizes/<id>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/prize/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"prize",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/prize/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \r\n    \"name\": \"Teste\",\r\n    \"total_prize_percentage\": 50,\r\n    \"first_place_percentage\": 30,\r\n    \"second_place_percentage\": 30,\r\n    \"tird_place_percentage\": 30,\r\n    \"fourth_place_percentage\": 30,\r\n    \"months_id\": 8\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/prize/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"prize",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/prize/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"name\": \"Teste2\",\r\n    \"total_prize_percentage\": 50,\r\n    \"first_place_percentage\": 80,\r\n    \"second_place_percentage\": 40,\r\n    \"tird_place_percentage\": 10,\r\n    \"fourth_place_percentage\": 1\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/prize/37",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"prize",
+								"37"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/prize/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/prize/37",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"prize",
+								"37"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "winner",
+			"item": [
+				{
+					"name": "/winners/<year>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/winners/2022",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"winners",
+								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winner/<id>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/winner/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"winner",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winner/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \r\n    \"teams_id\": \"20\",\r\n    \"prizes_id\": 1,\r\n    \"place\": 1,\r\n    \"prize_value\": 73.50\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/winner/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"winner",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winner/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"place\": 1,\r\n    \"prize_value\": 70.15\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/winner/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"winner",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winner/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/winner/2",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"winner",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

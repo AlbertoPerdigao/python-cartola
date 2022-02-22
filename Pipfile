@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+Flask = "*"
+Flask-SQLAlchemy = "*"
+Flask-RESTful = "*"
+Flask-JWT-Extended = "*"
+Flask-Migrate = "*"
+Flask-Marshmallow = "*"
+Marshmallow = "*"
+Marshmallow-SQLAlchemy = "*"
+SQLAlchemy = "*"
+psycopg2 = "*"
+alembic = "*"
+
+
+[dev-packages]
+black = "*"
+
+[requires]
+python_version = "3.10"
