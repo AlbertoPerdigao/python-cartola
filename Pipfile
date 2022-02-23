@@ -15,7 +15,7 @@ Marshmallow-SQLAlchemy = "*"
 SQLAlchemy = "*"
 psycopg2 = "*"
 alembic = "*"
-
+requests = "*"
 
 [dev-packages]
 black = "*"

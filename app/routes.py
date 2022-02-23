@@ -4,7 +4,8 @@ from resources.month import Month, MonthList
 from resources.payment import Payment, PaymentList
 from resources.prize import Prize, PrizeList
 from resources.round import Round, RoundList
-from resources.winner import Winner, WinnerList
+from resources.winner import Winner, WinnerList, WinnerPrizesCalculation
+from resources.score import Score, ScoreList
 
 api.add_resource(Team, "/team/<int:id>")
 api.add_resource(TeamList, "/teams")
@@ -23,4 +24,7 @@ api.add_resource(RoundList, "/rounds/<int:year>")
 
 api.add_resource(Winner, "/winner/<int:id>")
 api.add_resource(WinnerList, "/winners/<int:year>")
-# api.add_resource(WinnerCalculation, "/winners/calculation")
+api.add_resource(WinnerPrizesCalculation, "/winners/auto_calculation")
+
+api.add_resource(Score, "/score/<int:id>")
+api.add_resource(ScoreList, "/scores/<int:year>")

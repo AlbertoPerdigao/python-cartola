@@ -31,10 +31,14 @@ class PaymentModel(TimeMixin, db.Model):
     @classmethod
     def find_by_id(cls, id: int) -> "PaymentModel":
         return cls.query.get(id)
-
+   
     @classmethod
     def find_by_team_id_month_id(cls, teams_id: int, months_id: int) -> "PaymentModel":
         return cls.query.filter_by(teams_id=teams_id, months_id=months_id).first()
+
+    @classmethod
+    def find_all_by_months_id(cls, months_id: int) -> "PaymentModel":
+        return cls.query.filter_by(months_id=months_id).all()
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["PaymentModel"]:

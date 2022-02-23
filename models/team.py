@@ -1,6 +1,7 @@
 from typing import List
 from models.time_mixin import TimeMixin
 from models.payment import PaymentModel
+from models.score import ScoreModel
 from app import db
 
 
@@ -17,6 +18,7 @@ class TeamModel(TimeMixin, db.Model):
 
     winners = db.relationship("WinnerModel", back_populates="team", lazy="dynamic")
     payments = db.relationship("PaymentModel", back_populates="team", lazy="dynamic")
+    scores = db.relationship("ScoreModel", back_populates="team", lazy="dynamic")
 
     def __repr__(self) -> str:
         return "<Team id:{}, name:{}, active:{}, slug:{}, id_tag:{}, url_escudo_png:{}, player_name:{}>".format(

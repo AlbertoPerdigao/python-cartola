@@ -1,4 +1,5 @@
-import datetime
+import datetime, requests
+from decimal import Decimal
 from flask_restful import Resource
 from flask import request
 from models.winner import WinnerModel
@@ -13,11 +14,12 @@ from app.messages import (
     ERROR_DELETING_OBJECT,
     OBJECT_CREATED_SUCCESSFULLY,
     OBJECT_DELETED_SUCCESSFULLY,
+    ERROR_GETTING_STATUS_CARTOLA
 )
 
 winner_schema = WinnerSchema()
 winner_list_schema = WinnerSchema(many=True)
-
+CARTOLA_STATUS_URI = "https://api.cartolafc.globo.com/mercado/status"
 
 class Winner(Resource):
     @classmethod
@@ -109,15 +111,74 @@ class WinnerList(Resource):
         return {"winners": winner_list_schema.dump(winners)}, 200
 
 
-class WinnerCalculation(Resource):
+class WinnerPrizesCalculation(Resource):
     @classmethod
     def get(cls):
-        # Calculates the winners of the current year
+        from models.payment import PaymentModel
+        from models.month import MonthModel
+
+        # Calculates the winners prizes of the current month/year
+
+        # Finds the current month by the round_number and current year
+        #   The current round is obtained by the Cartola FC api (https://api.cartolafc.globo.com/mercado/status)
+        # Get the winners of the current month
+        # Updates their prize value according to the amount of people who paid the monthly fee, their places and prize type
+
+        current_year = datetime.datetime.now().year        
+        
         try:
-            now = datetime.datetime.now()
-            winners = WinnerModel.find_all_by_year(now.year)
+            status_cartola = requests.get(CARTOLA_STATUS_URI).json()
+        except requests.ConnectionError:
+            return {"message": ERROR_GETTING_STATUS_CARTOLA}, 500
+        
+        #current_round_number = status_cartola["rodada_atual"]        
+        current_round_number = 3
 
-            # for winner in winners:
+        current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)
+        print("current month: {}".format(current_month))
 
+        try:
+            payments = PaymentModel.find_all_by_months_id(current_month.id)
         except:
-            return {"message": ERROR_GETTING_OBJECTS.format(cls.__name__)}, 500
+            return {"message": ERROR_GETTING_OBJECTS.format(PaymentModel.__name__)}, 500
+
+        total_payments_amount = 0
+        for payment in payments:
+            total_payments_amount += payment.amount        
+        print("total_payments_amount: {}".format(total_payments_amount))
+
+
+        # TO DO
+        # Get the winners through the Cartola's FC api
+
+        #get_month_winners(current_month.id)
+
+        try:
+            winners = WinnerModel.find_all_by_months_id(current_month.id)
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format(WinnerModel.__name__)}, 500
+
+        if not winners:
+            winner1 = WinnerModel()
+            winner1.place = 1
+            winner1.teams_id = 20
+            winner1.prizes_id = 1
+
+        for winner in winners:
+            print(winner)
+            total_prize_percentage = winner.prize.total_prize_percentage
+            #total_prize_value = (Decimal(total_prize_percentage) * Decimal(total_payments_amount)) / Decimal(100)
+            total_prize_value = (total_prize_percentage * total_payments_amount) / 100            
+            total_prize_value = total_prize_value.quantize(Decimal('.01'))
+            print(total_prize_value)
+
+            if winner.place == 1:
+
+                winner.prize_value = 1
+
+            elif winner.place == 2:
+                winner.prize_value = 2
+            elif winner.place == 3:
+                winner.prize_value = 3
+            elif winner.place == 4:
+                winner.prize_value = 4
