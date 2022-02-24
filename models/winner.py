@@ -59,7 +59,7 @@ class WinnerModel(TimeMixin, db.Model):
         from models.prize import PrizeModel
         
         return (
-            cls.query.join(PrizeModel).filter(PrizeModel.months_id == months_id)
+            cls.query.join(PrizeModel).filter(PrizeModel.months_id == months_id).all()
         )
 
     @classmethod
@@ -68,5 +68,5 @@ class WinnerModel(TimeMixin, db.Model):
         from models.month import MonthModel
 
         return (
-            cls.query.join(PrizeModel).join(MonthModel).filter(MonthModel.year == year)
+            cls.query.join(PrizeModel).join(MonthModel).filter(MonthModel.year == year).all()
         )

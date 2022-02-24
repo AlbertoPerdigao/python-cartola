@@ -1,7 +1,9 @@
-import requests
 from flask_restful import Resource
 from flask import request
 from models.score import ScoreModel
+from models.team import TeamModel
+from models.month import MonthModel
+from resources.cartola_api import CartolaApi
 from schemas.score import ScoreSchema
 from app.messages import (
     OBJECT_NOT_FOUND,
@@ -17,7 +19,7 @@ from app.messages import (
 
 score_schema = ScoreSchema()
 score_list_schema = ScoreSchema(many=True)
-#CARTOLA_STATUS_URI = "https://api.cartolafc.globo.com/mercado/status"
+
 
 class Score(Resource):
     @classmethod
@@ -69,7 +71,7 @@ class Score(Resource):
         if not score:
             return {"message": OBJECT_NOT_FOUND.format(cls.__name__)}, 404
 
-        score.points = modified_score.points
+        score.value = modified_score.value
 
         try:
             score.save_to_db()
@@ -106,3 +108,64 @@ class ScoreList(Resource):
             return {"message": ERROR_GETTING_OBJECTS.format(cls.__name__)}, 500
 
         return {"scores": score_list_schema.dump(scores)}, 200
+
+class ScoreCartolaUpdate(Resource):
+    @classmethod
+    def get(cls):
+        # Gets the current round/year from Cartola's FC api
+        cartola_status = CartolaApi.get_cartola_status()
+        print(cartola_status)
+        #current_round_number = cartola_status["rodada_atual"]
+        #current_year = cartola_status["temporada"] #datetime.datetime.now().year
+        ### remove this code snippet when Cartola API is working, replacing it with the 3 lines above
+        current_round_number = 4
+        current_year = 2022
+        ###
+        
+        # Gets all teams
+        try:
+            teams = TeamModel.find_all()
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format(TeamModel.__name__)}, 500
+        
+        # Finds the round id by round number and year
+        try:
+            current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)
+        except:
+            return {"message": ERROR_GETTING_OBJECT.format(MonthModel.__name__)}, 500
+                
+        month_rounds = current_month.rounds
+
+        round_id = 0        
+        for round in month_rounds:
+            if round.round_number == current_round_number:
+                round_id = round.id
+                break        
+        
+        # For each team, updates the score based on the Cartola FC api;
+        # if the score is not already created for the current round, creates it
+
+        for team in teams:            
+            #cartola_team = CartolaApi.get_cartola_team_by_team_slug_round_number(team.slug, current_round_number)
+            #cartola_team_score_value = cartola_team["pontos"]
+            ### remove this code snippet when Cartola API is working, replacing it with the 2 lines above
+            import random, decimal            
+            cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))            
+            ###
+
+            score = ScoreModel.find_by_team_slug_round_number_year(team.slug, current_round_number, current_year)
+            
+            if score:
+                score.value = cartola_team_score_value
+            else:
+                score = ScoreModel()
+                score.value = cartola_team_score_value
+                score.rounds_id = round_id
+                score.teams_id = team.id                
+            
+            try:
+                score.save_to_db()
+            except:
+                return {"message": ERROR_UPDATING_OBJECT.format(cls.__name__)}, 500
+            
+        return {"message": OBJECT_CREATED_SUCCESSFULLY.format(cls.__name__)}, 200

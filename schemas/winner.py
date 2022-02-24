@@ -5,7 +5,7 @@ from models.winner import WinnerModel
 
 def validate_prize_value(prize_value):
     if prize_value <= 0:
-        raise ValidationError("The prize value must be greater than 0.")
+        raise ValidationError("The prize value must be greater than R$ 0,00.")
 
 
 def validate_place(place):

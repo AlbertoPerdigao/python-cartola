@@ -16,8 +16,8 @@ class PaymentModel(TimeMixin, db.Model):
     month = db.relationship("MonthModel", back_populates="payments")
 
     def __repr__(self) -> str:
-        return "<Payment id:{}, amount:{}, teams_id:{}, months_id:{}, month:{}>".format(
-            self.id, self.amount, self.teams_id, self.months_id, self.month
+        return "<Payment id:{}, amount:{}, teams_id:{}, months_id:{}, month:{}, team:{}>".format(
+            self.id, self.amount, self.teams_id, self.months_id, self.month, self.team
         )
 
     def save_to_db(self) -> None:

@@ -5,7 +5,7 @@ from models.prize import PrizeModel
 
 def validate_percentage(percentage):
     if percentage < 0:
-        raise ValidationError("The percentage must be equal or greater than 0.")
+        raise ValidationError("The percentage must be equal or greater than 0%.")
 
 
 class PrizeSchema(ma.SQLAlchemyAutoSchema):

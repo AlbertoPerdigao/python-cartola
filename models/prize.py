@@ -56,4 +56,4 @@ class PrizeModel(TimeMixin, db.Model):
     def find_all_by_year(cls, year: int) -> List["PrizeModel"]:
         from models.month import MonthModel
 
-        return cls.query.join(MonthModel).filter(MonthModel.year == year)
+        return cls.query.join(MonthModel).filter(MonthModel.year == year).all()

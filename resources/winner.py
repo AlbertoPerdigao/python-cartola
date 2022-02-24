@@ -1,8 +1,8 @@
-import datetime, requests
-from decimal import Decimal
 from flask_restful import Resource
 from flask import request
+from models.score import ScoreModel
 from models.winner import WinnerModel
+from resources.cartola_api import CartolaApi
 from schemas.winner import WinnerSchema
 from app.messages import (
     OBJECT_NOT_FOUND,
@@ -13,13 +13,12 @@ from app.messages import (
     ERROR_UPDATING_OBJECT,
     ERROR_DELETING_OBJECT,
     OBJECT_CREATED_SUCCESSFULLY,
-    OBJECT_DELETED_SUCCESSFULLY,
-    ERROR_GETTING_STATUS_CARTOLA
+    OBJECT_DELETED_SUCCESSFULLY    
 )
 
 winner_schema = WinnerSchema()
 winner_list_schema = WinnerSchema(many=True)
-CARTOLA_STATUS_URI = "https://api.cartolafc.globo.com/mercado/status"
+
 
 class Winner(Resource):
     @classmethod
@@ -116,26 +115,22 @@ class WinnerPrizesCalculation(Resource):
     def get(cls):
         from models.payment import PaymentModel
         from models.month import MonthModel
+        from models.prize import PrizeModel
 
-        # Calculates the winners prizes of the current month/year
+        # Calculates the winners and prizes of the current month/year
 
-        # Finds the current month by the round_number and current year
-        #   The current round is obtained by the Cartola FC api (https://api.cartolafc.globo.com/mercado/status)
-        # Get the winners of the current month
-        # Updates their prize value according to the amount of people who paid the monthly fee, their places and prize type
-
-        current_year = datetime.datetime.now().year        
-        
-        try:
-            status_cartola = requests.get(CARTOLA_STATUS_URI).json()
-        except requests.ConnectionError:
-            return {"message": ERROR_GETTING_STATUS_CARTOLA}, 500
-        
-        #current_round_number = status_cartola["rodada_atual"]        
+        # Finds the current month by the round_number and current year        
+                
+        cartola_status = CartolaApi.get_cartola_status()
+        #current_round_number = cartola_status["rodada_atual"]
         current_round_number = 3
+        current_year = cartola_status["temporada"] #datetime.datetime.now().year
 
         current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)
         print("current month: {}".format(current_month))
+        month_rounds = current_month.rounds
+
+        # Gets the payments amout and the prizes of the current month
 
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
@@ -147,23 +142,52 @@ class WinnerPrizesCalculation(Resource):
             total_payments_amount += payment.amount        
         print("total_payments_amount: {}".format(total_payments_amount))
 
+        
+        prizes = PrizeModel.find_by_months_id(current_month.id)
+        print(prizes)
+
 
         # TO DO
-        # Get the winners through the Cartola's FC api
+        # Get the scores through the Cartola FC api
+        # Get the winners through the scores
 
-        #get_month_winners(current_month.id)
+        #teams_scores = ScoreTeam.get_teams_scores_by_months_id(current_month.id, current_round_number) 
+       
+        #for s in teams_scores
+        #    ScoreModel.update_scores(s.nome, s.rodada, s.pontuacao)
 
         try:
-            winners = WinnerModel.find_all_by_months_id(current_month.id)
+            scores = ScoreModel.find_all_by_months_id(current_month.id)
         except:
             return {"message": ERROR_GETTING_OBJECTS.format(WinnerModel.__name__)}, 500
+        
+        sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
+        print(sorted_scores)
 
-        if not winners:
-            winner1 = WinnerModel()
-            winner1.place = 1
-            winner1.teams_id = 20
-            winner1.prizes_id = 1
+               
+        # Updates their prize value according to the amount of people who paid the monthly fee, their places and prize type
 
+        count = 1
+        for score in sorted_scores:
+            winner = WinnerModel()
+            winner.teams_id = score.teams_id
+            #winner.prizes_id = score.
+
+            if count == 1:
+                print("1st:{}".format(score.team.name))
+                winner.place = 1
+                
+                
+            elif count == 2:
+                print("2nd:{}".format(score.team.name))
+            elif count == 3:
+                print("3rd:{}".format(score.team.name))
+            elif count == 4:
+                print("4th:{}".format(score.team.name))
+                break            
+            count += 1                        
+            
+        """
         for winner in winners:
             print(winner)
             total_prize_percentage = winner.prize.total_prize_percentage
@@ -182,3 +206,4 @@ class WinnerPrizesCalculation(Resource):
                 winner.prize_value = 3
             elif winner.place == 4:
                 winner.prize_value = 4
+        """

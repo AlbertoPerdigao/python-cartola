@@ -568,14 +568,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/payment/3",
+							"raw": "localhost:5000/payment/1",
 							"host": [
 								"localhost"
 							],
 							"port": "5000",
 							"path": [
 								"payment",
-								"3"
+								"1"
 							]
 						}
 					},
@@ -610,7 +610,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{   \r\n    \"teams_id\": 26,\r\n    \"months_id\": 4,\r\n    \"amount\": 30.00\r\n}"
+							"raw": "{   \r\n    \"teams_id\": 29,\r\n    \"months_id\": 1,\r\n    \"amount\": 30.00\r\n}"
 						},
 						"url": {
 							"raw": "localhost:5000/payment/0",
@@ -731,7 +731,7 @@
 					"response": []
 				},
 				{
-					"name": "/prizes/<id>",
+					"name": "/prize/<id>",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -918,6 +918,25 @@
 					"response": []
 				},
 				{
+					"name": "/winners/auto_calculation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/winners/auto_calculation",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"winners",
+								"auto_calculation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "/winner/<id>",
 					"event": [
 						{
@@ -1021,6 +1040,193 @@
 							"path": [
 								"winner",
 								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "score",
+			"item": [
+				{
+					"name": "/scores/<year>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/scores/2022",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"scores",
+								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/score/<id>",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/score/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"score",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/scores/cartola_update",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/scores/cartola_update_teams_scores",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"scores",
+								"cartola_update_teams_scores"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/score/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \r\n    \"points\": 116.20,    \r\n    \"rounds_id\": 1,\r\n    \"teams_id\": 28\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/score/0",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"score",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/score/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"name\": \"Teste2\",\r\n    \"total_prize_percentage\": 50,\r\n    \"first_place_percentage\": 80,\r\n    \"second_place_percentage\": 40,\r\n    \"tird_place_percentage\": 10,\r\n    \"fourth_place_percentage\": 1\r\n}"
+						},
+						"url": {
+							"raw": "localhost:5000/score/1",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"score",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/prize/<id>",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/prize/37",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"prize",
+								"37"
 							]
 						}
 					},
