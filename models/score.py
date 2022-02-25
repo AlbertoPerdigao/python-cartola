@@ -1,4 +1,7 @@
+from decimal import Decimal
 from typing import List
+
+from flask import session
 from models.time_mixin import TimeMixin
 from app import db
 
@@ -30,10 +33,6 @@ class ScoreModel(TimeMixin, db.Model):
         return cls.query.get(id)
 
     @classmethod
-    def find_by_rounds_id(cls, rounds_id: int) -> "ScoreModel":
-        return cls.query.filter_by(rounds_id=rounds_id).all()        
-
-    @classmethod
     def find_by_team_slug_round_number_year(cls, team_slug: int, round_number: int, year: int) -> "ScoreModel":
         from models.round import RoundModel
         from models.team import TeamModel
@@ -41,20 +40,30 @@ class ScoreModel(TimeMixin, db.Model):
         return cls.query.join(RoundModel).join(MonthModel).join(TeamModel).where(RoundModel.round_number==round_number, TeamModel.slug==team_slug, MonthModel.year==year).first()
 
     @classmethod
-    def find_by_teams_id(cls, teams_id: int) -> "ScoreModel":
+    def find_by_rounds_id(cls, rounds_id: int) -> List["ScoreModel"]:
+        return cls.query.filter_by(rounds_id=rounds_id).all()
+
+    @classmethod
+    def find_by_teams_id(cls, teams_id: int) -> List["ScoreModel"]:
         return cls.query.filter_by(teams_id=teams_id).all()
 
     @classmethod
-    def find_by_teams_id_rounds_id(cls, teams_id: int, rounds_id: int) -> "ScoreModel":
+    def find_by_teams_id_rounds_id(cls, teams_id: int, rounds_id: int) -> List["ScoreModel"]:
         return cls.query.filter_by(teams_id=teams_id, rounds_id=rounds_id).all()
     
     @classmethod
     def find_all_by_months_id(cls, months_id: int) -> List["ScoreModel"]:
         from models.round import RoundModel
         
-        return (
-            cls.query.join(RoundModel).filter(RoundModel.months_id == months_id).all()
-        )
+        return cls.query.join(RoundModel).filter(RoundModel.months_id == months_id).all()
+        
+    
+    @classmethod
+    def sum_scores_by_months_id(cls, months_id: int) -> List[List]:
+        from models.round import RoundModel
+        from sqlalchemy.sql import func, desc
+
+        return db.session.query(func.sum(cls.value).label('value'), cls.teams_id).join(RoundModel).where(RoundModel.months_id == months_id).group_by(cls.teams_id).order_by(desc(func.sum(cls.value).label('value')), desc(cls.teams_id)).all()        
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["ScoreModel"]:

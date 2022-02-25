@@ -24,7 +24,7 @@ api.add_resource(RoundList, "/rounds/<int:year>")
 
 api.add_resource(Winner, "/winner/<int:id>")
 api.add_resource(WinnerList, "/winners/<int:year>")
-api.add_resource(WinnerPrizesCalculation, "/winners/auto_calculation")
+api.add_resource(WinnerPrizesCalculation, "/winners/auto_prizes_calculation")
 
 api.add_resource(Score, "/score/<int:id>")
 api.add_resource(ScoreList, "/scores/<int:year>")

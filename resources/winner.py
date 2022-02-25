@@ -1,5 +1,7 @@
-from flask_restful import Resource
+from decimal import Decimal
 from flask import request
+from flask_restful import Resource
+from models.month import MonthModel
 from models.score import ScoreModel
 from models.winner import WinnerModel
 from resources.cartola_api import CartolaApi
@@ -113,97 +115,121 @@ class WinnerList(Resource):
 class WinnerPrizesCalculation(Resource):
     @classmethod
     def get(cls):
-        from models.payment import PaymentModel
-        from models.month import MonthModel
-        from models.prize import PrizeModel
+        from models.month import MonthModel        
 
-        # Calculates the winners and prizes of the current month/year
+        # Calculates the winners and prizes of the current month/year for each type of award
 
         # Finds the current month by the round_number and current year        
                 
         cartola_status = CartolaApi.get_cartola_status()
+        #current_year = cartola_status["temporada"] #datetime.datetime.now().year
         #current_round_number = cartola_status["rodada_atual"]
+        ### remove this code snippet when Cartola API is working, replacing it with the 2 lines above
         current_round_number = 3
-        current_year = cartola_status["temporada"] #datetime.datetime.now().year
+        current_year = 2022
+        ###
+        
+        print(current_year)
+        try:
+            current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)            
+        except:
+            return {"message": ERROR_GETTING_OBJECT.format("Month")}, 500
+        
+        if not current_month:
+            return {"message": ERROR_GETTING_OBJECT.format("Month")}, 500
 
-        current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)
         print("current month: {}".format(current_month))
-        month_rounds = current_month.rounds
+        
+        cls.__calculates_winners_prize_mes(current_month)
 
-        # Gets the payments amout and the prizes of the current month
+        return {"message": "WinnerPrizesCalculation finished with success"}
+    
+    def __calculates_winners_prize_mes(current_month: MonthModel):
+        from models.payment import PaymentModel
+        from models.prize import PrizeModel
+
+        print("Prize - Mês - Current Month: {}".format(current_month.id))
+
+        # The winners will be those who have the highest sum of points from the rounds of the month
+
+        # Gets the rounds of the current month
+        #rounds = current_month.rounds
+
+        # Gets the payments amout and the prize "Mês" of the current month
 
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
         except:
-            return {"message": ERROR_GETTING_OBJECTS.format(PaymentModel.__name__)}, 500
+            return {"message": ERROR_GETTING_OBJECTS.format("Payments")}, 500
 
         total_payments_amount = 0
         for payment in payments:
-            total_payments_amount += payment.amount        
+            total_payments_amount += payment.amount
         print("total_payments_amount: {}".format(total_payments_amount))
+                
+        try:
+            prize = PrizeModel.find_by_name_months_id("Mês", current_month.id)            
+        except:
+            return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
 
-        
-        prizes = PrizeModel.find_by_months_id(current_month.id)
-        print(prizes)
-
-
-        # TO DO
-        # Get the scores through the Cartola FC api
-        # Get the winners through the scores
-
-        #teams_scores = ScoreTeam.get_teams_scores_by_months_id(current_month.id, current_round_number) 
-       
-        #for s in teams_scores
-        #    ScoreModel.update_scores(s.nome, s.rodada, s.pontuacao)
+        print(prize)                
+        total_prize_value = (prize.total_prize_percentage * total_payments_amount) / 100            
+        total_prize_value = total_prize_value.quantize(Decimal('.01'))
+        print("total_prize_value: {}".format(total_prize_value))               
+         
+        # Get the scores in the month
 
         try:
-            scores = ScoreModel.find_all_by_months_id(current_month.id)
+            sorted_scores = ScoreModel.sum_scores_by_months_id(current_month.id)
         except:
-            return {"message": ERROR_GETTING_OBJECTS.format(WinnerModel.__name__)}, 500
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
         
-        sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
-        print(sorted_scores)
+        if not sorted_scores:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+        
+        print(sorted_scores)        
+        
+        #sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
+        #print("sorted_scores: {}".format(sorted_scores))
 
-               
         # Updates their prize value according to the amount of people who paid the monthly fee, their places and prize type
-
-        count = 1
+        
+        place = 1
         for score in sorted_scores:
-            winner = WinnerModel()
-            winner.teams_id = score.teams_id
-            #winner.prizes_id = score.
+            teams_id = score[1]
 
-            if count == 1:
-                print("1st:{}".format(score.team.name))
-                winner.place = 1
-                
-                
-            elif count == 2:
-                print("2nd:{}".format(score.team.name))
-            elif count == 3:
-                print("3rd:{}".format(score.team.name))
-            elif count == 4:
-                print("4th:{}".format(score.team.name))
-                break            
-            count += 1                        
+            try:
+                winner = WinnerModel.find_by_teams_id_prizes_id(teams_id, prize.id)
+            except:
+                return {"message": ERROR_GETTING_OBJECT.format(Winner.__name__)}, 500
             
-        """
-        for winner in winners:
-            print(winner)
-            total_prize_percentage = winner.prize.total_prize_percentage
-            #total_prize_value = (Decimal(total_prize_percentage) * Decimal(total_payments_amount)) / Decimal(100)
-            total_prize_value = (total_prize_percentage * total_payments_amount) / 100            
-            total_prize_value = total_prize_value.quantize(Decimal('.01'))
-            print(total_prize_value)
+            if not winner:            
+                winner = WinnerModel()
+                winner.teams_id = score[1]
+                winner.prizes_id = prize.id
+            
+            winner.place = place
 
-            if winner.place == 1:
+            if place == 1:                                
+                winner.prize_value = (total_prize_value * prize.first_place_percentage) / 100
+                print("1st:{}".format(winner))
+            elif place == 2:                
+                winner.prize_value = (total_prize_value * prize.second_place_percentage) / 100
+                print("2nd:{}".format(winner))
+            elif place == 3:
+                winner.prize_value = (total_prize_value * prize.tird_place_percentage) / 100
+                print("3rd:{}".format(winner))
+            elif place == 4:
+                winner.prize_value = (total_prize_value * prize.fourth_place_percentage) / 100
+                print("4th:{}".format(winner))
 
-                winner.prize_value = 1
+            try:
+                winner.save_to_db()
+            except:
+                return {"message": ERROR_INSERTING_OBJECT.format(Winner.__name__)}, 500
+            
+            if place == 4:
+                break
 
-            elif winner.place == 2:
-                winner.prize_value = 2
-            elif winner.place == 3:
-                winner.prize_value = 3
-            elif winner.place == 4:
-                winner.prize_value = 4
-        """
+            place += 1
+            
