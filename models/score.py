@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import List
 
 from flask import session
+from models.month import MonthModel
 from models.time_mixin import TimeMixin
 from app import db
 

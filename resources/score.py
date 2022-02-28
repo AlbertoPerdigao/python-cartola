@@ -109,19 +109,9 @@ class ScoreList(Resource):
 
         return {"scores": score_list_schema.dump(scores)}, 200
 
-class ScoreCartolaUpdate(Resource):
+class ScoreCartolaUpdate():
     @classmethod
-    def get(cls):
-        # Gets the current round/year from Cartola's FC api
-        cartola_status = CartolaApi.get_cartola_status()
-        print(cartola_status)
-        #current_round_number = cartola_status["rodada_atual"]
-        #current_year = cartola_status["temporada"] #datetime.datetime.now().year
-        ### remove this code snippet when Cartola API is working, replacing it with the 3 lines above
-        current_round_number = 4
-        current_year = 2022
-        ###
-        
+    def update_teams_scores(cls, current_round_number: int, current_year: int) -> None:
         # Gets all teams
         try:
             teams = TeamModel.find_all()
@@ -153,7 +143,10 @@ class ScoreCartolaUpdate(Resource):
             cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))            
             ###
 
-            score = ScoreModel.find_by_team_slug_round_number_year(team.slug, current_round_number, current_year)
+            try:
+                score = ScoreModel.find_by_team_slug_round_number_year(team.slug, current_round_number, current_year)
+            except:
+                return {"message": ERROR_GETTING_OBJECT.format(MonthModel.__name__)}, 500
             
             if score:
                 score.value = cartola_team_score_value
@@ -168,4 +161,4 @@ class ScoreCartolaUpdate(Resource):
             except:
                 return {"message": ERROR_UPDATING_OBJECT.format(cls.__name__)}, 500
             
-        return {"message": OBJECT_CREATED_SUCCESSFULLY.format(cls.__name__)}, 200
+        #return {"message": OBJECT_CREATED_SUCCESSFULLY.format(cls.__name__)}, 200

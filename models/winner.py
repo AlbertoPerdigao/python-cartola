@@ -40,7 +40,7 @@ class WinnerModel(TimeMixin, db.Model):
 
     @classmethod
     def find_by_teams_id_prizes_id(cls, teams_id: int, prizes_id: int) -> "WinnerModel":
-        return cls.query.filter_by(teams_id=teams_id, prizes_id=prizes_id).all()
+        return cls.query.filter_by(teams_id=teams_id, prizes_id=prizes_id).first()
 
     @classmethod
     def find_by_month_name_year(cls, month_name: int, year: int) -> "WinnerModel":

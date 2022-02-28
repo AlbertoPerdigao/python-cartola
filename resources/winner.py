@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_UP
 from flask import request
 from flask_restful import Resource
 from models.month import MonthModel
@@ -115,7 +115,8 @@ class WinnerList(Resource):
 class WinnerPrizesCalculation(Resource):
     @classmethod
     def get(cls):
-        from models.month import MonthModel        
+        from models.month import MonthModel
+        from resources.score import ScoreCartolaUpdate
 
         # Calculates the winners and prizes of the current month/year for each type of award
 
@@ -128,7 +129,10 @@ class WinnerPrizesCalculation(Resource):
         current_round_number = 3
         current_year = 2022
         ###
-        
+
+        # Updates the teams scores trough the current round an year
+        ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)
+
         print(current_year)
         try:
             current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)            
@@ -152,11 +156,7 @@ class WinnerPrizesCalculation(Resource):
 
         # The winners will be those who have the highest sum of points from the rounds of the month
 
-        # Gets the rounds of the current month
-        #rounds = current_month.rounds
-
         # Gets the payments amout and the prize "Mês" of the current month
-
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
         except:
@@ -173,8 +173,7 @@ class WinnerPrizesCalculation(Resource):
             return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
 
         print(prize)                
-        total_prize_value = (prize.total_prize_percentage * total_payments_amount) / 100            
-        total_prize_value = total_prize_value.quantize(Decimal('.01'))
+        total_prize_value = ((prize.total_prize_percentage * total_payments_amount) / 100).quantize(Decimal('.01'))        
         print("total_prize_value: {}".format(total_prize_value))               
          
         # Get the scores in the month
@@ -190,37 +189,44 @@ class WinnerPrizesCalculation(Resource):
         print(sorted_scores)        
         
         #sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
-        #print("sorted_scores: {}".format(sorted_scores))
-
-        # Updates their prize value according to the amount of people who paid the monthly fee, their places and prize type
+                
+        # Deletes the winners by the type of prize if they exists
+        try:
+            winners_to_delete = WinnerModel.find_by_prizes_id(prize.id)
+        except:
+            return {"message": ERROR_GETTING_OBJECT.format(Winner.__name__)}, 500
         
+        print(winners_to_delete)
+
+        for winner_to_delete in winners_to_delete:
+            try:
+                winner_to_delete.delete_from_db()                
+            except:
+                return {"message": ERROR_DELETING_OBJECT.format(Winner.__name__)}, 500
+
+        # Inserts the winners, their prize value according to the amount of people who paid the monthly fee, their places and prize type
         place = 1
         for score in sorted_scores:
             teams_id = score[1]
-
-            try:
-                winner = WinnerModel.find_by_teams_id_prizes_id(teams_id, prize.id)
-            except:
-                return {"message": ERROR_GETTING_OBJECT.format(Winner.__name__)}, 500
-            
-            if not winner:            
-                winner = WinnerModel()
-                winner.teams_id = score[1]
-                winner.prizes_id = prize.id
-            
+                        
+            #if not winner:                
+            winner = WinnerModel()                
+            winner.prizes_id = prize.id
+            winner.teams_id = teams_id
             winner.place = place
+            print(winner)
 
             if place == 1:                                
-                winner.prize_value = (total_prize_value * prize.first_place_percentage) / 100
+                winner.prize_value = ((total_prize_value * prize.first_place_percentage) / 100).quantize(Decimal('.01'), rounding=ROUND_UP)
                 print("1st:{}".format(winner))
             elif place == 2:                
-                winner.prize_value = (total_prize_value * prize.second_place_percentage) / 100
+                winner.prize_value = ((total_prize_value * prize.second_place_percentage) / 100).quantize(Decimal('.01'))
                 print("2nd:{}".format(winner))
             elif place == 3:
-                winner.prize_value = (total_prize_value * prize.tird_place_percentage) / 100
+                winner.prize_value = ((total_prize_value * prize.tird_place_percentage) / 100).quantize(Decimal('.01'))
                 print("3rd:{}".format(winner))
             elif place == 4:
-                winner.prize_value = (total_prize_value * prize.fourth_place_percentage) / 100
+                winner.prize_value = ((total_prize_value * prize.fourth_place_percentage) / 100).quantize(Decimal('.01'))
                 print("4th:{}".format(winner))
 
             try:
