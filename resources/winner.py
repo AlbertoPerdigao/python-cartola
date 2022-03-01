@@ -1,7 +1,9 @@
 from decimal import Decimal, ROUND_UP
+from werkzeug.security import safe_str_cmp
 from flask import request
 from flask_restful import Resource
 from models.month import MonthModel
+from models.prize import PrizeModel
 from models.score import ScoreModel
 from models.winner import WinnerModel
 from resources.cartola_api import CartolaApi
@@ -117,6 +119,7 @@ class WinnerPrizesCalculation(Resource):
     def get(cls):
         from models.month import MonthModel
         from resources.score import ScoreCartolaUpdate
+        from models.payment import PaymentModel
 
         # Calculates the winners and prizes of the current month/year for each type of award
 
@@ -132,8 +135,7 @@ class WinnerPrizesCalculation(Resource):
 
         # Updates the teams scores trough the current round an year
         ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)
-
-        print(current_year)
+        
         try:
             current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)            
         except:
@@ -143,20 +145,8 @@ class WinnerPrizesCalculation(Resource):
             return {"message": ERROR_GETTING_OBJECT.format("Month")}, 500
 
         print("current month: {}".format(current_month))
-        
-        cls.__calculates_winners_prize_mes(current_month)
 
-        return {"message": "WinnerPrizesCalculation finished with success"}
-    
-    def __calculates_winners_prize_mes(current_month: MonthModel):
-        from models.payment import PaymentModel
-        from models.prize import PrizeModel
-
-        print("Prize - Mês - Current Month: {}".format(current_month.id))
-
-        # The winners will be those who have the highest sum of points from the rounds of the month
-
-        # Gets the payments amout and the prize "Mês" of the current month
+        # Gets the current month's payment amount
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
         except:
@@ -165,29 +155,69 @@ class WinnerPrizesCalculation(Resource):
         total_payments_amount = 0
         for payment in payments:
             total_payments_amount += payment.amount
-        print("total_payments_amount: {}".format(total_payments_amount))
+        
+        for prize in current_month.prizes:
+            if safe_str_cmp(prize.name, "Mês"):
+                cls.__calculates_winners_prize_mes(current_month, total_payments_amount, prize)
+            elif safe_str_cmp(prize.name, "Premiada"):
+                print("Premiada")
+                #cls.__calculates_winners_prize_premiada(current_month, current_round_number, total_payments_amount)
+
+        return {"message": "WinnerPrizesCalculation finished with success"}
+    
+    
+
+    def __calculates_winners_prize_premiada(current_month: MonthModel, current_round_number: int, total_payments_amount: Decimal, prize: PrizeModel) -> None:
+        #from models.prize import PrizeModel
+
+        print("Prize: {prize.name} - Current Month: {}".format(current_month.id))
+
+        # The winners will be those who have the highest number of points from the current awarded round of the month
+        
+        # Gets the prize "Mês" of the current month                        
+        #try:
+        #    prize = PrizeModel.find_by_name_months_id("Premiada", current_month.id)
+        #except:
+        #    return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
+        
+        total_prize_value = ((prize.total_prize_percentage * total_payments_amount) / 100).quantize(Decimal('.01'))
+
+        # Gets the number of awarded rounds in the month
+        awarded_rounds = 0
+        for round in current_month.rounds:            
+            if round.round_number == current_round_number:
+                round_id = round.id            
+            if round.awarded:
+                awarded_rounds += 1
+        
+        print("awarded rounds: {}".format(awarded_rounds))
+        print("round id: {}".format(round_id))
                 
-        try:
-            prize = PrizeModel.find_by_name_months_id("Mês", current_month.id)            
-        except:
-            return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
 
-        print(prize)                
+
+    def __calculates_winners_prize_mes(current_month: MonthModel, total_payments_amount: Decimal, prize: PrizeModel) -> None:        
+        from models.prize import PrizeModel
+
+        print("Prize: {} - Current Month: {}".format(prize.name, current_month.id))
+
+        # The winners will be those who have the highest sum of points from the rounds of the month
+
+        # Gets the prize "Mês" of the current month                        
+        #try:
+        #    prize = PrizeModel.find_by_name_months_id("Mês", current_month.id)            
+        #except:
+        #    return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
+        
         total_prize_value = ((prize.total_prize_percentage * total_payments_amount) / 100).quantize(Decimal('.01'))        
-        print("total_prize_value: {}".format(total_prize_value))               
-         
+        
         # Get the scores in the month
-
         try:
-            sorted_scores = ScoreModel.sum_scores_by_months_id(current_month.id)
+            sorted_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
         
         if not sorted_scores:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-        
-        print(sorted_scores)        
-        
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500                        
         #sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
                 
         # Deletes the winners by the type of prize if they exists
@@ -196,8 +226,6 @@ class WinnerPrizesCalculation(Resource):
         except:
             return {"message": ERROR_GETTING_OBJECT.format(Winner.__name__)}, 500
         
-        print(winners_to_delete)
-
         for winner_to_delete in winners_to_delete:
             try:
                 winner_to_delete.delete_from_db()                
