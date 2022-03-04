@@ -16,13 +16,15 @@ class PrizeModel(TimeMixin, db.Model):
     second_place_percentage = db.Column(db.Numeric(7, 2), nullable=False)
     tird_place_percentage = db.Column(db.Numeric(7, 2), nullable=False)
     fourth_place_percentage = db.Column(db.Numeric(7, 2), nullable=False)
-
-    winners = db.relationship("WinnerModel", back_populates="prize", lazy="dynamic")
+    
     months_id = db.Column(db.Integer, db.ForeignKey("months.id"), nullable=False)
     month = db.relationship("MonthModel", back_populates="prizes")
+    rounds_id = db.Column(db.Integer, db.ForeignKey("rounds.id"), nullable=True, unique=True)
+    round = db.relationship("RoundModel", back_populates="prize")
+    winners = db.relationship("WinnerModel", back_populates="prize", lazy="dynamic")
 
     def __repr__(self) -> str:
-        return "<Prize id:{}, name:{}, total_prize_percentage:{}, first_place_percentage:{}, second_place_percentage:{}, tird_place_percentage:{}, fourth_place_percentage:{} >".format(
+        return "<Prize id:{}, name:{}, total_prize_percentage:{}, first_place_percentage:{}, second_place_percentage:{}, tird_place_percentage:{}, fourth_place_percentage:{}, months_id:{}, rounds_id:{} >".format(
             self.id,
             self.name,
             self.total_prize_percentage,
@@ -30,6 +32,8 @@ class PrizeModel(TimeMixin, db.Model):
             self.second_place_percentage,
             self.tird_place_percentage,
             self.fourth_place_percentage,
+            self.months_id,
+            self.rounds_id,
         )
 
     def save_to_db(self) -> None:

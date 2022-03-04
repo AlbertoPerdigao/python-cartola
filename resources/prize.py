@@ -56,7 +56,7 @@ class Prize(Resource):
     def put(cls, id: int):
         prize_json = request.get_json()
         modified_prize = prize_schema.load(
-            prize_json, partial=("months_id",)
+            prize_json, partial=("months_id", "rounds_id",)
         )  # Validates the fields
 
         try:
@@ -73,6 +73,8 @@ class Prize(Resource):
         prize.second_place_percentage = modified_prize.second_place_percentage
         prize.tird_place_percentage = modified_prize.tird_place_percentage
         prize.fourth_place_percentage = modified_prize.fourth_place_percentage
+        if modified_prize.rounds_id:
+            prize.rounds_id = modified_prize.rounds_id
 
         try:
             prize.save_to_db()

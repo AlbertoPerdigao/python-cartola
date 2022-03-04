@@ -57,7 +57,6 @@ class ScoreModel(TimeMixin, db.Model):
         from models.round import RoundModel
         
         return cls.query.join(RoundModel).filter(RoundModel.months_id == months_id).all()
-        
     
     @classmethod
     def sum_teams_scores_by_months_id(cls, months_id: int) -> List[List]:

@@ -16,7 +16,7 @@ class PrizeSchema(ma.SQLAlchemyAutoSchema):
             "created_at",
             "updated_at",
         )
-        load_only = ("months_id",)
+        load_only = ("months_id", "rounds_id",)
         load_instance = True
         include_fk = True
         ordered = True
@@ -47,3 +47,13 @@ class PrizeSchema(ma.SQLAlchemyAutoSchema):
             "tax",
         ),
     )
+    round = ma.Nested(
+        "RoundSchema",
+        only=(
+            "id",
+            "round_number",
+            "awarded",            
+        ),
+    )
+
+

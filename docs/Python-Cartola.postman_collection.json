@@ -426,7 +426,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \r\n    \"months_id\": 8,\r\n    \"round_number\": 38,\r\n    \"awarded\": true\r\n}"
+							"raw": "{    \r\n    \"months_id\": 8,\r\n    \"round_number\": 39,\r\n    \"awarded\": true\r\n}"
 						},
 						"url": {
 							"raw": "localhost:5000/round/0",
@@ -471,17 +471,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{   \r\n    \"months_id\": 7,\r\n    \"awarded\": true\r\n}"
+							"raw": "{   \r\n    \"months_id\": 1,\r\n    \"awarded\": true\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/round/42",
+							"raw": "localhost:5000/round/3",
 							"host": [
 								"localhost"
 							],
 							"port": "5000",
 							"path": [
 								"round",
-								"42"
+								"3"
 							]
 						}
 					},
@@ -736,14 +736,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/prize/1",
+							"raw": "localhost:5000/prize/9",
 							"host": [
 								"localhost"
 							],
 							"port": "5000",
 							"path": [
 								"prize",
-								"1"
+								"9"
 							]
 						}
 					},
@@ -918,19 +918,19 @@
 					"response": []
 				},
 				{
-					"name": "/winners/auto_calculation",
+					"name": "/winners/auto_prizes_calculation",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/winners/auto_calculation",
+							"raw": "localhost:5000/winners/auto_prizes_calculation",
 							"host": [
 								"localhost"
 							],
 							"port": "5000",
 							"path": [
 								"winners",
-								"auto_calculation"
+								"auto_prizes_calculation"
 							]
 						}
 					},
@@ -1099,25 +1099,6 @@
 							"path": [
 								"score",
 								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/scores/cartola_update",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:5000/scores/cartola_update_teams_scores",
-							"host": [
-								"localhost"
-							],
-							"port": "5000",
-							"path": [
-								"scores",
-								"cartola_update_teams_scores"
 							]
 						}
 					},
