@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List
+from typing import Dict, List
 
 from flask import session
 from models.month import MonthModel
@@ -59,11 +59,20 @@ class ScoreModel(TimeMixin, db.Model):
         return cls.query.join(RoundModel).filter(RoundModel.months_id == months_id).all()
     
     @classmethod
-    def sum_teams_scores_by_months_id(cls, months_id: int) -> List[List]:
+    def sum_teams_scores_by_months_id(cls, months_id: int) -> List["ScoreModel"]:
         from models.round import RoundModel
         from sqlalchemy.sql import func, desc
-
-        return db.session.query(func.sum(cls.value).label('value'), cls.teams_id).join(RoundModel).where(RoundModel.months_id == months_id).group_by(cls.teams_id).order_by(desc(func.sum(cls.value).label('value')), desc(cls.teams_id)).all()        
+        
+        scores = db.session.query(func.sum(cls.value).label('value'), cls.teams_id).join(RoundModel).where(RoundModel.months_id == months_id).group_by(cls.teams_id).order_by(desc(func.sum(cls.value).label('value')), desc(cls.teams_id)).all()        
+        scores_list = list()        
+        for score in scores:
+            sm = ScoreModel()
+            sm.value = score.value
+            sm.teams_id = score.teams_id
+            scores_list.append(sm)
+        
+        return scores_list
+                
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["ScoreModel"]:

@@ -131,10 +131,11 @@ class WinnerPrizesCalculation(Resource):
         cartola_status = CartolaApi.get_cartola_status()
         current_year = cartola_status["temporada"] #datetime.datetime.now().year
         current_round_number = cartola_status["rodada_atual"]
-        print("year: {}, round: {}".format(current_year, current_round_number))
+        print("cartola_status -> year: {}, round: {}".format(current_year, current_round_number))
         ### remove this code snippet when Cartola API is working
         current_round_number = 3
         current_year = 2022
+        print("year: {}, round: {}".format(current_year, current_round_number))
         ###
 
         # Updates the teams scores trough the current round an year
@@ -161,12 +162,10 @@ class WinnerPrizesCalculation(Resource):
             total_payments_amount += payment.amount
         
         for prize in current_month.prizes:
-            if safe_str_cmp(prize.name, MES_PRIZE):
-                print(MES_PRIZE)
+            if safe_str_cmp(prize.name, MES_PRIZE):                
                 cls.__calculates_mes_prize_winners(cls, current_month, total_payments_amount, prize)
-            elif safe_str_cmp(prize.name, RODADA_PREMIADA_PRIZE) and prize.round.round_number == current_round_number and prize.round.awarded:
-                print(RODADA_PREMIADA_PRIZE)
-                #cls.__calculates_rodada_premiada_prize_winners(cls, current_month, total_payments_amount, prize)
+            elif safe_str_cmp(prize.name, RODADA_PREMIADA_PRIZE) and prize.round.round_number == current_round_number and prize.round.awarded:                
+                cls.__calculates_rodada_premiada_prize_winners(cls, current_month, total_payments_amount, prize)
 
         return {"message": "{} finished with success".format(cls.__name__)}
 
@@ -184,10 +183,6 @@ class WinnerPrizesCalculation(Resource):
 
         month_prize_value = ((prize.total_prize_percentage * total_payments_amount) / 100).quantize(Decimal('.01'))        
         round_prize_value = (month_prize_value / awarded_rounds).quantize(Decimal('.01'))
-        
-        print("month_prize_value: {}".format(month_prize_value))
-        print("awarded rounds: {}".format(awarded_rounds))
-        print("round_prize_value: {}".format(round_prize_value))
 
         # Get the scores of the round
         try:
@@ -198,8 +193,7 @@ class WinnerPrizesCalculation(Resource):
         if not scores:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
-        sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
-        print(sorted_scores)
+        sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)        
 
         cls.__updates_winners(prize, sorted_scores, round_prize_value)
 
@@ -213,20 +207,16 @@ class WinnerPrizesCalculation(Resource):
         
         # Gets the scores of the month
         try:
-            scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
+            sorted_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
         
-        if not scores:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-        
-        sorted_scores = list()
-        for score in scores:
-            sorted_scores.append({"value": score.value, "teams_id": score.teams_id})
+        if not sorted_scores:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500        
         
         cls.__updates_winners(prize, sorted_scores, total_prize_value)
 
-    def __updates_winners(prize: PrizeModel, sorted_scores: List[ScoreModel], total_prize_value):
+    def __updates_winners(prize: PrizeModel, sorted_scores: List[ScoreModel], total_prize_value: Decimal):
 
         # Deletes the winners by the type of prize if they exists
         try:
@@ -239,18 +229,14 @@ class WinnerPrizesCalculation(Resource):
                 winner_to_delete.delete_from_db()                
             except:
                 return {"message": ERROR_DELETING_OBJECT.format(Winner.__name__)}, 500
-
+        
         # Inserts the winners, their prize value according to the amount of people who paid the monthly fee, their places and prize type
         place = 1
-        for score in sorted_scores:
-            #teams_id = score[1]
-                        
-            #if not winner:                
+        for score in sorted_scores:                      
             winner = WinnerModel()                
             winner.prizes_id = prize.id
             winner.teams_id = score.teams_id
-            winner.place = place
-            print(winner)
+            winner.place = place            
 
             if place == 1:                                
                 winner.prize_value = ((total_prize_value * prize.first_place_percentage) / 100).quantize(Decimal('.01'), rounding=ROUND_UP)
