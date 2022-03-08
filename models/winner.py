@@ -16,7 +16,9 @@ class WinnerModel(TimeMixin, db.Model):
     prize = db.relationship("PrizeModel", back_populates="winners")
 
     def __repr__(self) -> str:
-        return "<Winner id:{}, palce:{}, prize_value:{}, teams_id:{}, prizes_id:{}>".format(self.id, self.place, self.prize_value, self.teams_id, self.prizes_id)
+        return "<Winner id:{}, palce:{}, prize_value:{}, teams_id:{}, prizes_id:{}>".format(
+            self.id, self.place, self.prize_value, self.teams_id, self.prizes_id
+        )
 
     def save_to_db(self) -> None:
         db.session.add(self)
@@ -57,7 +59,7 @@ class WinnerModel(TimeMixin, db.Model):
     @classmethod
     def find_all_by_months_id(cls, months_id: int) -> List["WinnerModel"]:
         from models.prize import PrizeModel
-        
+
         return (
             cls.query.join(PrizeModel).filter(PrizeModel.months_id == months_id).all()
         )
@@ -68,5 +70,8 @@ class WinnerModel(TimeMixin, db.Model):
         from models.month import MonthModel
 
         return (
-            cls.query.join(PrizeModel).join(MonthModel).filter(MonthModel.year == year).all()
+            cls.query.join(PrizeModel)
+            .join(MonthModel)
+            .filter(MonthModel.year == year)
+            .all()
         )

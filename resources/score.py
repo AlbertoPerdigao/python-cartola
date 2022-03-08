@@ -14,7 +14,7 @@ from app.messages import (
     ERROR_UPDATING_OBJECT,
     ERROR_DELETING_OBJECT,
     OBJECT_CREATED_SUCCESSFULLY,
-    OBJECT_DELETED_SUCCESSFULLY    
+    OBJECT_DELETED_SUCCESSFULLY,
 )
 
 score_schema = ScoreSchema()
@@ -38,7 +38,7 @@ class Score(Resource):
     def post(cls, id: int):
         score_json = request.get_json()
         score = score_schema.load(score_json)  # Validates the fields
-        
+
         try:
             score_exists = ScoreModel.find_by_teams_id_rounds_id(
                 score.teams_id, score.rounds_id
@@ -53,7 +53,7 @@ class Score(Resource):
             score.save_to_db()
         except:
             return {"message": ERROR_INSERTING_OBJECT.format(cls.__name__)}, 500
-        
+
         return {"message": OBJECT_CREATED_SUCCESSFULLY.format(cls.__name__)}, 201
 
     @classmethod
@@ -109,7 +109,8 @@ class ScoreList(Resource):
 
         return {"scores": score_list_schema.dump(scores)}, 200
 
-class ScoreCartolaUpdate():
+
+class ScoreCartolaUpdate:
     @classmethod
     def update_teams_scores(cls, current_round_number: int, current_year: int) -> None:
         # Gets all teams
@@ -117,48 +118,55 @@ class ScoreCartolaUpdate():
             teams = TeamModel.find_all()
         except:
             return {"message": ERROR_GETTING_OBJECTS.format(TeamModel.__name__)}, 500
-        
+
         # Finds the round id by round number and year
         try:
-            current_month = MonthModel.find_by_round_number_year(current_round_number, current_year)
+            current_month = MonthModel.find_by_round_number_year(
+                current_round_number, current_year
+            )
         except:
             return {"message": ERROR_GETTING_OBJECT.format(MonthModel.__name__)}, 500
-                
+
         month_rounds = current_month.rounds
 
-        round_id = 0        
+        round_id = 0
         for round in month_rounds:
             if round.round_number == current_round_number:
                 round_id = round.id
-                break        
-        
+                break
+
         # For each team, updates the score based on the Cartola FC api;
         # if the score is not already created for the current round, creates it
 
-        for team in teams:            
-            #cartola_team = CartolaApi.get_cartola_team_by_team_slug_round_number(team.slug, current_round_number)
-            #cartola_team_score_value = cartola_team["pontos"]
+        for team in teams:
+            # cartola_team = CartolaApi.get_cartola_team_by_team_slug_round_number(team.slug, current_round_number)
+            # cartola_team_score_value = cartola_team["pontos"]
             ### remove this code snippet when Cartola API is working, replacing it with the 2 lines above
-            import random, decimal            
-            cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))            
+            import random, decimal
+
+            cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))
             ###
 
             try:
-                score = ScoreModel.find_by_team_slug_round_number_year(team.slug, current_round_number, current_year)
+                score = ScoreModel.find_by_team_slug_round_number_year(
+                    team.slug, current_round_number, current_year
+                )
             except:
-                return {"message": ERROR_GETTING_OBJECT.format(MonthModel.__name__)}, 500
-            
+                return {
+                    "message": ERROR_GETTING_OBJECT.format(MonthModel.__name__)
+                }, 500
+
             if score:
                 score.value = cartola_team_score_value
             else:
                 score = ScoreModel()
                 score.value = cartola_team_score_value
                 score.rounds_id = round_id
-                score.teams_id = team.id                
-            
+                score.teams_id = team.id
+
             try:
                 score.save_to_db()
             except:
                 return {"message": ERROR_UPDATING_OBJECT.format(cls.__name__)}, 500
-            
-        #return {"message": OBJECT_CREATED_SUCCESSFULLY.format(cls.__name__)}, 200
+
+        # return {"message": OBJECT_CREATED_SUCCESSFULLY.format(cls.__name__)}, 200

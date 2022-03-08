@@ -31,7 +31,7 @@ class PaymentModel(TimeMixin, db.Model):
     @classmethod
     def find_by_id(cls, id: int) -> "PaymentModel":
         return cls.query.get(id)
-   
+
     @classmethod
     def find_by_team_id_month_id(cls, teams_id: int, months_id: int) -> "PaymentModel":
         return cls.query.filter_by(teams_id=teams_id, months_id=months_id).first()

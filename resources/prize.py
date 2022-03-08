@@ -56,7 +56,11 @@ class Prize(Resource):
     def put(cls, id: int):
         prize_json = request.get_json()
         modified_prize = prize_schema.load(
-            prize_json, partial=("months_id", "rounds_id",)
+            prize_json,
+            partial=(
+                "months_id",
+                "rounds_id",
+            ),
         )  # Validates the fields
 
         try:

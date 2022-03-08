@@ -23,7 +23,4 @@ class RoundSchema(ma.SQLAlchemyAutoSchema):
             "year",
         ),
     )
-    prize = ma.Nested(
-        "PrizeSchema", only=("id", "name")
-    )
-
+    prize = ma.Nested("PrizeSchema", only=("id", "name"))

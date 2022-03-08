@@ -41,7 +41,13 @@ class MonthModel(TimeMixin, db.Model):
     @classmethod
     def find_by_round_number_year(cls, round_number: int, year: int) -> "MonthModel":
         from models.round import RoundModel
-        return cls.query.with_entities(MonthModel).join(RoundModel).where(MonthModel.year == year, RoundModel.round_number == round_number).first()
+
+        return (
+            cls.query.with_entities(MonthModel)
+            .join(RoundModel)
+            .where(MonthModel.year == year, RoundModel.round_number == round_number)
+            .first()
+        )
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["MonthModel"]:

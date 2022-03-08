@@ -16,10 +16,12 @@ class PrizeModel(TimeMixin, db.Model):
     second_place_percentage = db.Column(db.Numeric(7, 2), nullable=False)
     tird_place_percentage = db.Column(db.Numeric(7, 2), nullable=False)
     fourth_place_percentage = db.Column(db.Numeric(7, 2), nullable=False)
-    
+
     months_id = db.Column(db.Integer, db.ForeignKey("months.id"), nullable=False)
     month = db.relationship("MonthModel", back_populates="prizes")
-    rounds_id = db.Column(db.Integer, db.ForeignKey("rounds.id"), nullable=True, unique=True)
+    rounds_id = db.Column(
+        db.Integer, db.ForeignKey("rounds.id"), nullable=True, unique=True
+    )
     round = db.relationship("RoundModel", back_populates="prize")
     winners = db.relationship("WinnerModel", back_populates="prize", lazy="dynamic")
 

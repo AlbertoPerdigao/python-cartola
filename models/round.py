@@ -9,11 +9,11 @@ class RoundModel(TimeMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round_number = db.Column(db.Integer, nullable=False)
     awarded = db.Column(db.Boolean, nullable=False)
-    
+
     months_id = db.Column(db.Integer, db.ForeignKey("months.id"), nullable=False)
     month = db.relationship("MonthModel", back_populates="rounds")
     scores = db.relationship("ScoreModel", back_populates="round", lazy="dynamic")
-    prize = db.relationship("PrizeModel", back_populates="round", lazy="dynamic") # 1:1
+    prize = db.relationship("PrizeModel", back_populates="round", lazy="dynamic")  # 1:1
 
     def __repr__(self) -> str:
         return "<Round id:{}, round_number:{}, awarded:{}, months_id:{}>".format(
@@ -31,7 +31,7 @@ class RoundModel(TimeMixin, db.Model):
     @classmethod
     def find_by_id(cls, id: int) -> "RoundModel":
         return cls.query.get(id)
-    
+
     @classmethod
     def find_rounds_by_year(cls, months_id: int) -> List[int]:
         from models.month import MonthModel

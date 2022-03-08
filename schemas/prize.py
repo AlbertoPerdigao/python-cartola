@@ -16,7 +16,10 @@ class PrizeSchema(ma.SQLAlchemyAutoSchema):
             "created_at",
             "updated_at",
         )
-        load_only = ("months_id", "rounds_id",)
+        load_only = (
+            "months_id",
+            "rounds_id",
+        )
         load_instance = True
         include_fk = True
         ordered = True
@@ -37,7 +40,16 @@ class PrizeSchema(ma.SQLAlchemyAutoSchema):
         as_string=True, required=True, validate=validate_percentage
     )
 
-    winners = ma.Nested("WinnerSchema", many=True, only=("id", "place", "prize_value", "team",))
+    winners = ma.Nested(
+        "WinnerSchema",
+        many=True,
+        only=(
+            "id",
+            "place",
+            "prize_value",
+            "team",
+        ),
+    )
     month = ma.Nested(
         "MonthSchema",
         only=(
@@ -52,8 +64,6 @@ class PrizeSchema(ma.SQLAlchemyAutoSchema):
         only=(
             "id",
             "round_number",
-            "awarded",            
+            "awarded",
         ),
     )
-
-

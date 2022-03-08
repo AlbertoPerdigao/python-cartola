@@ -28,4 +28,4 @@ api.add_resource(WinnerPrizesCalculation, "/winners/auto_prizes_calculation")
 
 api.add_resource(Score, "/score/<int:id>")
 api.add_resource(ScoreList, "/scores/<int:year>")
-#api.add_resource(ScoreCartolaUpdate, "/scores/cartola_update_teams_scores")
+# api.add_resource(ScoreCartolaUpdate, "/scores/cartola_update_teams_scores")

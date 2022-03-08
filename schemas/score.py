@@ -11,13 +11,16 @@ class ScoreSchema(ma.SQLAlchemyAutoSchema):
             "created_at",
             "updated_at",
         )
-        load_only = ("teams_id", "rounds_id",)
+        load_only = (
+            "teams_id",
+            "rounds_id",
+        )
         load_instance = True
         include_fk = True
         ordered = True
 
-    value = fields.Decimal(as_string=True, required=True)    
-    
+    value = fields.Decimal(as_string=True, required=True)
+
     team = ma.Nested(
         "TeamSchema",
         only=(
@@ -27,7 +30,7 @@ class ScoreSchema(ma.SQLAlchemyAutoSchema):
     )
 
     round = ma.Nested(
-        "RoundSchema",        
+        "RoundSchema",
         only=(
             "id",
             "round_number",
