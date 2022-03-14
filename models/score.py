@@ -100,6 +100,28 @@ class ScoreModel(TimeMixin, db.Model):
         return scores_list
 
     @classmethod
+    def sum_teams_scores_by_list_months_id(cls, months_ids: List[int]) -> List["ScoreModel"]:
+        from models.round import RoundModel
+        from sqlalchemy.sql import func, desc
+
+        scores = (
+            db.session.query(func.sum(cls.value).label("value"), cls.teams_id)
+            .join(RoundModel)
+            .where(RoundModel.months_id.in_(months_ids))
+            .group_by(cls.teams_id)
+            .order_by(desc(func.sum(cls.value).label("value")), desc(cls.teams_id))
+            .all()
+        )
+        scores_list = list()
+        for score in scores:
+            sm = ScoreModel()
+            sm.value = score.value
+            sm.teams_id = score.teams_id
+            scores_list.append(sm)
+
+        return scores_list
+
+    @classmethod
     def find_all_by_year(cls, year: int) -> List["ScoreModel"]:
         from models.round import RoundModel
         from models.month import MonthModel

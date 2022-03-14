@@ -1,3 +1,4 @@
+from turtle import st
 from typing import List
 from models.time_mixin import TimeMixin
 from models.winner import WinnerModel
@@ -19,9 +20,7 @@ class PrizeModel(TimeMixin, db.Model):
 
     months_id = db.Column(db.Integer, db.ForeignKey("months.id"), nullable=False)
     month = db.relationship("MonthModel", back_populates="prizes")
-    rounds_id = db.Column(
-        db.Integer, db.ForeignKey("rounds.id"), nullable=True, unique=True
-    )
+    rounds_id = db.Column(db.Integer, db.ForeignKey("rounds.id"), nullable=True)
     round = db.relationship("RoundModel", back_populates="prize")
     winners = db.relationship("WinnerModel", back_populates="prize", lazy="dynamic")
 
@@ -55,8 +54,16 @@ class PrizeModel(TimeMixin, db.Model):
         return cls.query.filter_by(name=name, months_id=months_id).first()
 
     @classmethod
-    def find_by_months_id(cls, months_id: int) -> "PrizeModel":
+    def find_by_months_id(cls, months_id: int) -> List["PrizeModel"]:
         return cls.query.filter_by(months_id=months_id).all()
+    
+    @classmethod
+    def find_by_rounds_id(cls, rounds_id: int, name: str) -> "PrizeModel":
+        return cls.query.filter_by(rounds_id=rounds_id, name=name).first()
+    
+    @classmethod
+    def find_by_name(cls, name: str) -> List["PrizeModel"]:
+        return cls.query.filter_by(name=name).all()
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["PrizeModel"]:
