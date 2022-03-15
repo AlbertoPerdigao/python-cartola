@@ -172,19 +172,27 @@ class WinnerPrizesCalculation(Resource):
 
         for prize in current_month.prizes:
             if safe_str_cmp(prize.name, MES_PRIZE):
-                cls.__calculates_mes_prize_winners(current_month, total_payments_amount, prize)
-                print("Mês")
-            elif (safe_str_cmp(prize.name, RODADA_PREMIADA_PRIZE) and prize.round.round_number == current_round_number
-                and prize.round.awarded):
-                cls.__calculates_rodada_premiada_prize_winners(current_month, total_payments_amount, prize)
-            elif (safe_str_cmp(prize.name, COPA_DA_LIGA_PRIZE)):
+                cls.__calculates_mes_prize_winners(
+                    current_month, total_payments_amount, prize
+                )
+            elif (
+                safe_str_cmp(prize.name, RODADA_PREMIADA_PRIZE)
+                and prize.round.round_number == current_round_number
+                and prize.round.awarded
+            ):
+                cls.__calculates_rodada_premiada_prize_winners(
+                    current_month, total_payments_amount, prize
+                )
+            elif safe_str_cmp(prize.name, COPA_DA_LIGA_PRIZE):
                 print("Copa da Liga")
-            elif (safe_str_cmp(prize.name, PATRIMONIO_PRIZE)):
+            elif safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
                 print("Patrimônio")
 
         # Gets the amount of payments for the current shift months
         try:
-            months_ids = MonthModel.find_shift_months_ids_by_round_number_year(current_round_number, current_year)
+            months_ids = MonthModel.find_shift_months_ids_by_round_number_year(
+                current_round_number, current_year
+            )
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("MonthModel")}, 500
 
@@ -195,17 +203,21 @@ class WinnerPrizesCalculation(Resource):
                 payments = PaymentModel.find_all_by_months_id(month.id)
                 months_ids_list.append(month.id)
             except:
-                return {"message": ERROR_GETTING_OBJECTS.format("Payments")}, 500            
-            
+                return {"message": ERROR_GETTING_OBJECTS.format("Payments")}, 500
+
             for payment in payments:
                 total_payments_amount += payment.amount
 
-        cls.__calculates_turno_prize_winners(months_ids_list, current_round_number, total_payments_amount)
+        cls.__calculates_turno_prize_winners(
+            months_ids_list, current_round_number, total_payments_amount
+        )
 
         return {"message": "{} finished with success".format(cls.__name__)}
 
     @classmethod
-    def __calculates_turno_prize_winners(cls, months_ids_list, current_round_number, total_payments_amount) -> None:
+    def __calculates_turno_prize_winners(
+        cls, months_ids_list, current_round_number, total_payments_amount
+    ) -> None:
         print("Prize: {} - Round: {}".format(TURNO_PRIZE, current_round_number))
 
         # The winners will be those who have the highest number of points in the current shift
@@ -213,7 +225,9 @@ class WinnerPrizesCalculation(Resource):
 
         turno_prizes = PrizeModel.find_by_name(TURNO_PRIZE)
         for turno_prize in turno_prizes:
-            if (turno_prize.round.round_number == 19 and current_round_number <= 19) or (turno_prize.round.round_number == 38 and current_round_number > 19):
+            if (
+                turno_prize.round.round_number == 19 and current_round_number <= 19
+            ) or (turno_prize.round.round_number == 38 and current_round_number > 19):
                 prize = turno_prize
 
         if not prize:
@@ -225,7 +239,9 @@ class WinnerPrizesCalculation(Resource):
 
         # Gets the scores of the shift
         try:
-            sorted_scores = ScoreModel.sum_teams_scores_by_list_months_id(months_ids_list)
+            sorted_scores = ScoreModel.sum_teams_scores_by_list_months_id(
+                months_ids_list
+            )
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
@@ -304,7 +320,12 @@ class WinnerPrizesCalculation(Resource):
         cls.__updates_winners(prize, sorted_scores, total_prize_value)
 
     @classmethod
-    def __updates_winners(cls, prize: PrizeModel, sorted_scores: List[ScoreModel], total_prize_value: Decimal):
+    def __updates_winners(
+        cls,
+        prize: PrizeModel,
+        sorted_scores: List[ScoreModel],
+        total_prize_value: Decimal,
+    ):
 
         # Deletes the winners by the type of prize if they exists
         try:
@@ -312,11 +333,22 @@ class WinnerPrizesCalculation(Resource):
         except:
             return {"message": ERROR_GETTING_OBJECT.format(Winner.__name__)}, 500
 
+        first_object = True
         for winner_to_delete in winners_to_delete:
             try:
                 winner_to_delete.delete_from_db()
             except:
                 return {"message": ERROR_DELETING_OBJECT.format(Winner.__name__)}, 500
+
+            if first_object:
+                first_object = False
+                try:
+                    print("reset sequence: {}".format(winner_to_delete.id))
+                    WinnerModel.reset_sequence(winner_to_delete.id)
+                except:
+                    return {
+                        "message": ERROR_UPDATING_OBJECT.format(Winner.__name__)
+                    }, 500
 
         # Inserts the winners, their prize value according to the amount of people who paid the monthly fee, their places and prize type
         place = 1

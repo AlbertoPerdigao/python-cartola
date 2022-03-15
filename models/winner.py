@@ -29,6 +29,14 @@ class WinnerModel(TimeMixin, db.Model):
         db.session.commit()
 
     @classmethod
+    def reset_sequence(cls, id_sequence: int) -> None:
+        # sql = "SELECT (SELECT setval('scm_teste_python.winners_id_seq', id)) FROM scm_teste_python.winners ORDER BY id DESC LIMIT 1;"
+        sql = "SELECT setval('scm_teste_python.winners_id_seq', {}, FALSE);".format(
+            id_sequence
+        )
+        db.session.execute(sql)
+
+    @classmethod
     def find_by_id(cls, id: int) -> "WinnerModel":
         return cls.query.get(id)
 

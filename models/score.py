@@ -100,7 +100,9 @@ class ScoreModel(TimeMixin, db.Model):
         return scores_list
 
     @classmethod
-    def sum_teams_scores_by_list_months_id(cls, months_ids: List[int]) -> List["ScoreModel"]:
+    def sum_teams_scores_by_list_months_id(
+        cls, months_ids: List[int]
+    ) -> List["ScoreModel"]:
         from models.round import RoundModel
         from sqlalchemy.sql import func, desc
 
