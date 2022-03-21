@@ -28,6 +28,7 @@ MES_PRIZE = "Mês"
 TURNO_PRIZE = "Turno"
 COPA_DA_LIGA_PRIZE = "Copa da Liga"
 PATRIMONIO_PRIZE = "Patrimônio"
+CAMPEONATO_PRIZE = "Campeonato"
 
 
 class Winner(Resource):
@@ -183,11 +184,12 @@ class WinnerPrizesCalculation(Resource):
                 cls.__calculates_rodada_premiada_prize_winners(
                     current_month, total_payments_amount, prize
                 )
-            elif safe_str_cmp(prize.name, COPA_DA_LIGA_PRIZE):
-                print("Copa da Liga")
             elif safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
                 print("Patrimônio")
+            elif safe_str_cmp(prize.name, COPA_DA_LIGA_PRIZE):
+                print("Copa da Liga")
 
+        # Turno Prize
         # Gets the amount of payments for the current shift months
         try:
             months_ids = MonthModel.find_shift_months_ids_by_round_number_year(
@@ -209,21 +211,69 @@ class WinnerPrizesCalculation(Resource):
                 total_payments_amount += payment.amount
 
         cls.__calculates_turno_prize_winners(
-            months_ids_list, current_round_number, total_payments_amount
+            months_ids_list, current_round_number, total_payments_amount, current_year
         )
+
+        # Campeonato Prize
+        # Gets the amount of payments of the year
+        total_payments_amount = 0
+        try:
+            payments = PaymentModel.find_all_by_year(current_year)
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format("Payments")}, 500
+
+        for payment in payments:
+            total_payments_amount += payment.amount
+
+        try:
+            prizes = PrizeModel.find_by_name("Campeonato", current_year)
+        except:
+            return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
+
+        for prize in prizes:
+            cls.__calculates_campeonato_prize_winners(total_payments_amount, prize, current_year)
+            break
 
         return {"message": "{} finished with success".format(cls.__name__)}
 
     @classmethod
+    def __calculates_campeonato_prize_winners(
+        cls, total_payments_amount: Decimal, prize: PrizeModel, current_year: int
+    ) -> None:
+        print("Prize: {} - Year: {}".format(prize.name, current_year))
+
+        # The winners will be those who have the highest number of points in the year
+
+        total_prize_value = (
+            (prize.total_prize_percentage * total_payments_amount) / 100
+        ).quantize(Decimal(".01"))
+
+        # Gets the teams scores of the year
+
+        try:
+            sorted_scores = ScoreModel.sum_teams_scores_by_year(current_year)
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        if not sorted_scores:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        cls.__updates_winners(prize, sorted_scores, total_prize_value)
+
+    @classmethod
     def __calculates_turno_prize_winners(
-        cls, months_ids_list, current_round_number, total_payments_amount
+        cls,
+        months_ids_list: List[int],
+        current_round_number: int,
+        total_payments_amount: Decimal,
+        current_year: int,
     ) -> None:
         print("Prize: {} - Round: {}".format(TURNO_PRIZE, current_round_number))
 
         # The winners will be those who have the highest number of points in the current shift
         # The shifts are divided in 2: shift 1 - round 1 to 19 and shift 2 - round 20 to 38
 
-        turno_prizes = PrizeModel.find_by_name(TURNO_PRIZE)
+        turno_prizes = PrizeModel.find_by_name(TURNO_PRIZE, current_year)
         for turno_prize in turno_prizes:
             if (
                 turno_prize.round.round_number == 19 and current_round_number <= 19

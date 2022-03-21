@@ -62,8 +62,12 @@ class PrizeModel(TimeMixin, db.Model):
         return cls.query.filter_by(rounds_id=rounds_id, name=name).first()
 
     @classmethod
-    def find_by_name(cls, name: str) -> List["PrizeModel"]:
-        return cls.query.filter_by(name=name).all()
+    def find_by_name(cls, name: str, year: int) -> List["PrizeModel"]:
+        from models.month import MonthModel
+
+        return (
+            cls.query.join(MonthModel).filter(MonthModel.year == year, cls.name == name).all()
+        )
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["PrizeModel"]:
