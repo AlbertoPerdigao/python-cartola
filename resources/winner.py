@@ -158,9 +158,7 @@ class WinnerPrizesCalculation(Resource):
 
         if not current_month:
             return {"message": ERROR_GETTING_OBJECT.format("Month")}, 500
-
-        print("current month: {}".format(current_month))
-
+        
         # Gets the current month's payment amount
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
@@ -185,9 +183,9 @@ class WinnerPrizesCalculation(Resource):
                     current_month, total_payments_amount, prize
                 )
             elif safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
-                print("Patrimônio")
+                print("\nPatrimônio")
             elif safe_str_cmp(prize.name, COPA_DA_LIGA_PRIZE):
-                print("Copa da Liga")
+                print("\nCopa da Liga")
 
         # Turno Prize
         # Gets the amount of payments for the current shift months
@@ -224,10 +222,13 @@ class WinnerPrizesCalculation(Resource):
 
         for payment in payments:
             total_payments_amount += payment.amount
-
+        
         try:
-            prizes = PrizeModel.find_by_name("Campeonato", current_year)
+            prizes = PrizeModel.find_by_name(CAMPEONATO_PRIZE, current_year)
         except:
+            return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
+
+        if not prizes:
             return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
 
         for prize in prizes:
@@ -240,7 +241,7 @@ class WinnerPrizesCalculation(Resource):
     def __calculates_campeonato_prize_winners(
         cls, total_payments_amount: Decimal, prize: PrizeModel, current_year: int
     ) -> None:
-        print("Prize: {} - Year: {}".format(prize.name, current_year))
+        print("\nPrize: {} - Year: {}".format(prize.name, current_year))
 
         # The winners will be those who have the highest number of points in the year
 
@@ -268,12 +269,16 @@ class WinnerPrizesCalculation(Resource):
         total_payments_amount: Decimal,
         current_year: int,
     ) -> None:
-        print("Prize: {} - Round: {}".format(TURNO_PRIZE, current_round_number))
+        print("\nPrize: {} - Shift: {}".format(TURNO_PRIZE, 1 if current_round_number <= 19 else 2))
 
         # The winners will be those who have the highest number of points in the current shift
         # The shifts are divided in 2: shift 1 - round 1 to 19 and shift 2 - round 20 to 38
 
-        turno_prizes = PrizeModel.find_by_name(TURNO_PRIZE, current_year)
+        try:
+            turno_prizes = PrizeModel.find_by_name(TURNO_PRIZE, current_year)
+        except:
+            return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
+                
         for turno_prize in turno_prizes:
             if (
                 turno_prize.round.round_number == 19 and current_round_number <= 19
@@ -309,7 +314,7 @@ class WinnerPrizesCalculation(Resource):
     ) -> None:
 
         print(
-            "Prize: {} - Current Month: {} - Round: {}".format(
+            "\nPrize: {} - Current Month: {} - Round: {}".format(
                 prize.name, current_month.id, prize.round.round_number
             )
         )
@@ -350,7 +355,7 @@ class WinnerPrizesCalculation(Resource):
         prize: PrizeModel,
     ) -> None:
 
-        print("Prize: {} - Current Month: {}".format(prize.name, current_month.id))
+        print("\nPrize: {} - Current Month: {}".format(prize.name, current_month.id))
 
         # The winners will be those who have the highest sum of points from the rounds of the month
 
@@ -393,7 +398,7 @@ class WinnerPrizesCalculation(Resource):
             if first_object:
                 first_object = False
                 try:
-                    print("reset sequence: {}".format(winner_to_delete.id))
+                    #print("reset sequence: {}".format(winner_to_delete.id))
                     WinnerModel.reset_sequence(winner_to_delete.id)
                 except:
                     return {
