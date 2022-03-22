@@ -4,8 +4,9 @@ from resources.month import Month, MonthList
 from resources.payment import Payment, PaymentList
 from resources.prize import Prize, PrizeList
 from resources.round import Round, RoundList
-from resources.winner import Winner, WinnerList, WinnerPrizesCalculation
+from resources.winner import Winner, WinnerList
 from resources.score import Score, ScoreList, ScoreCartolaUpdate
+from resources.winner_prizes_calculation import WinnerPrizesCalculation
 
 api.add_resource(Team, "/team/<int:id>")
 api.add_resource(TeamList, "/teams")

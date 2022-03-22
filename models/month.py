@@ -51,7 +51,7 @@ class MonthModel(TimeMixin, db.Model):
     @classmethod
     def find_shift_months_ids_by_round_number_year(
         cls, round_number: int, year: int
-    ) -> List["MonthModel"]:
+    ) -> List[int]:
 
         if round_number <= 19:
             months = (
@@ -73,14 +73,12 @@ class MonthModel(TimeMixin, db.Model):
                 .group_by(MonthModel.id)
                 .all()
             )
+        
+        months_ids_list = list()
+        for month in months:          
+            months_ids_list.append(month.id)
 
-        months_list = list()
-        for month in months:
-            m = MonthModel()
-            m.id = month.id
-            months_list.append(m)
-
-        return months_list
+        return months_ids_list
 
     @classmethod
     def find_all_by_year(cls, year: int) -> List["MonthModel"]:
