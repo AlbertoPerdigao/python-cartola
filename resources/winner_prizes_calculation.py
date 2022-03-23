@@ -10,6 +10,7 @@ from models.payment import PaymentModel
 from models.winner import WinnerModel
 from resources.score import ScoreCartolaUpdate
 from resources.cartola_api import CartolaApi
+from resources.score import ScoreCartolaUpdate
 from app.messages import (    
     ERROR_GETTING_OBJECT,
     ERROR_GETTING_OBJECTS,
@@ -98,14 +99,35 @@ class WinnerPrizesCalculation(Resource):
 
         # Patrimônio Prize        
         for prize in current_month.prizes:            
-            if safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
-                cls.__calculates_patrimonio_prize_winners()
+            if safe_str_cmp(prize.name, PATRIMONIO_PRIZE):                
+                cls.__calculates_patrimonio_prize_winners(current_month, total_payments_amount, prize)
         
         return {"message": "Automatic prizes calculation finished with success!"}
 
     @classmethod
-    def __calculates_patrimonio_prize_winners(cls) -> None:
-        print(PATRIMONIO_PRIZE)
+    def __calculates_patrimonio_prize_winners(cls, current_month: MonthModel, total_payments_amount: Decimal, prize: PrizeModel) -> None:
+        print("\nPrize: {} - Month: {}".format(PATRIMONIO_PRIZE, current_month.id))
+
+        # The winners will be those who have the highest number of cartoletas and who have not won another prize in the current month
+
+        #cls.__updates_prize_places_percentage(unlock_4th_place, prize)
+
+        total_prize_value = (
+            (prize.total_prize_percentage * total_payments_amount) / 100
+        ).quantize(Decimal(".01"))
+
+        # Gets the scores of the month
+        try:
+            sorted_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)            
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        if not sorted_scores:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        # Gets the winners of the month
+        
+
 
     @classmethod
     def __calculates_campeonato_prize_winners(
@@ -235,7 +257,7 @@ class WinnerPrizesCalculation(Resource):
     ) -> None:
 
         print(
-            "\nPrize: {} - Current Month: {} - Round: {}".format(
+            "\nPrize: {} - Month: {} - Round: {}".format(
                 prize.name, current_month.id, prize.round.round_number
             )
         )
@@ -276,7 +298,7 @@ class WinnerPrizesCalculation(Resource):
         prize: PrizeModel,
     ) -> None:
 
-        print("\nPrize: {} - Current Month: {}".format(prize.name, current_month.id))
+        print("\nPrize: {} - Month: {}".format(prize.name, current_month.id))
 
         # The winners will be those who have the highest sum of points from the rounds of the month
 
@@ -307,14 +329,14 @@ class WinnerPrizesCalculation(Resource):
         try:
             winners_to_delete = WinnerModel.find_by_prizes_id(prize.id)
         except:
-            return {"message": ERROR_GETTING_OBJECT.format(Winner.__name__)}, 500
+            return {"message": ERROR_GETTING_OBJECT.format("Winner")}, 500
 
         first_object = True
         for winner_to_delete in winners_to_delete:
             try:
                 winner_to_delete.delete_from_db()
             except:
-                return {"message": ERROR_DELETING_OBJECT.format(Winner.__name__)}, 500
+                return {"message": ERROR_DELETING_OBJECT.format("Winner")}, 500
 
             if first_object:
                 first_object = False
@@ -323,7 +345,7 @@ class WinnerPrizesCalculation(Resource):
                     WinnerModel.reset_sequence(winner_to_delete.id)
                 except:
                     return {
-                        "message": ERROR_UPDATING_OBJECT.format(Winner.__name__)
+                        "message": ERROR_UPDATING_OBJECT.format("Winner")
                     }, 500
 
         # Inserts the winners, their prize value according to the amount of people who paid the monthly fee, their places and prize type
@@ -358,7 +380,7 @@ class WinnerPrizesCalculation(Resource):
             try:
                 winner.save_to_db()
             except:
-                return {"message": ERROR_INSERTING_OBJECT.format(Winner.__name__)}, 500
+                return {"message": ERROR_INSERTING_OBJECT.format("Winner")}, 500
 
             if place == 4:
                 break

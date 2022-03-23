@@ -141,10 +141,12 @@ class ScoreCartolaUpdate:
         for team in teams:
             # cartola_team = CartolaApi.get_cartola_team_by_team_slug_round_number(team.slug, current_round_number)
             # cartola_team_score_value = cartola_team["pontos"]
-            ### remove this code snippet when Cartola API is working, replacing it with the 2 lines above
+            # cartola_team_score_cartoletas = cartola_team["cartoletas"]
+            ### remove this code snippet when Cartola API is working, replacing it with the 3 lines above
             import random, decimal
 
             cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))
+            cartola_team_score_cartoletas = decimal.Decimal(random.randrange(0, 120))
             ###
 
             try:
@@ -158,13 +160,15 @@ class ScoreCartolaUpdate:
 
             if score:
                 score.value = cartola_team_score_value
+                score.cartoletas = cartola_team_score_cartoletas
             else:
                 score = ScoreModel()
                 score.value = cartola_team_score_value
+                score.cartoletas = cartola_team_score_cartoletas
                 score.rounds_id = round_id
                 score.teams_id = team.id
 
             try:
                 score.save_to_db()
             except:
-                return {"message": ERROR_UPDATING_OBJECT.format(cls.__name__)}, 500
+                return {"message": ERROR_UPDATING_OBJECT.format(ScoreModel.__name__)}, 500

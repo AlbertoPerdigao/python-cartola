@@ -12,6 +12,7 @@ class ScoreModel(TimeMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Numeric(5, 2), nullable=False)
+    cartoletas = db.Column(db.Numeric(5, 2), nullable=False)
 
     teams_id = db.Column(db.Integer, db.ForeignKey("teams.id"), nullable=False)
     team = db.relationship("TeamModel", back_populates="scores")
