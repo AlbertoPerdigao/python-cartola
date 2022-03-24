@@ -108,7 +108,47 @@ class WinnerPrizesCalculation(Resource):
     def __calculates_patrimonio_prize_winners(cls, current_month: MonthModel, total_payments_amount: Decimal, prize: PrizeModel) -> None:
         print("\nPrize: {} - Month: {}".format(PATRIMONIO_PRIZE, current_month.id))
 
-        # The winners will be those who have the highest number of cartoletas and who have not won another prize in the current month
+        # The winners will be those who have the highest number of cartoletas and 
+        # who have not won another prize in the current month
+        
+        # Gets the teams scores and cartoletas of the month 
+        try:
+            sorted_team_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
+            month_scores = ScoreModel.find_all_by_months_id(current_month.id)
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        if not sorted_team_scores or not month_scores:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        # Calculates the team's patrimony
+        # The calculation consists of taking the difference between the 
+        # number of cartoletas from the first and the last rounds of the month
+        #teams_patrimony = dict()        
+        #for month_score in month_scores:            
+        #    if month_score.round.round_number in teams_patrimony.keys():                
+        #        teams_patrimony.setdefault(month_score.round.round_number, []).append(month_score)
+        #    else:                
+        #        teams_patrimony[month_score.round.round_number] = []
+        round_numbers = []
+        for month_score in month_scores:
+            round_numbers.append(month_score.round.round_number)
+        round_numbers = sorted(round_numbers)        
+        first_round = round_numbers[0]
+        last_round = round_numbers[-1]
+        
+        teams_patrimony = {}
+        for month_score in month_scores:
+            if month_score.round.round_number == first_round:
+                teams_patrimony[month_score.teams_id] = month_score.cartoletas
+        for month_score in month_scores:    
+            if month_score.round.round_number == last_round:
+                teams_patrimony[month_score.teams_id] = month_score.cartoletas - teams_patrimony[month_score.teams_id]
+        
+        sorted_teams_patrimony = sorted(teams_patrimony.items(), key=lambda item: item[1], reverse=True)
+        print(sorted_teams_patrimony)
+
+
 
         #cls.__updates_prize_places_percentage(unlock_4th_place, prize)
 
@@ -116,14 +156,6 @@ class WinnerPrizesCalculation(Resource):
             (prize.total_prize_percentage * total_payments_amount) / 100
         ).quantize(Decimal(".01"))
 
-        # Gets the scores of the month
-        try:
-            sorted_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)            
-        except:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-
-        if not sorted_scores:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
         # Gets the winners of the month
         

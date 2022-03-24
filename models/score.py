@@ -20,8 +20,8 @@ class ScoreModel(TimeMixin, db.Model):
     round = db.relationship("RoundModel", back_populates="scores")
 
     def __repr__(self) -> str:
-        return "<Score id:{}, value:{}, teams_id:{}, rounds_id:{}>".format(
-            self.id, self.value, self.teams_id, self.rounds_id
+        return "<Score id:{}, value:{}, cartoletas:{} teams_id:{}, rounds_id:{}>".format(
+            self.id, self.value, self.cartoletas, self.teams_id, self.rounds_id
         )
 
     def save_to_db(self) -> None:

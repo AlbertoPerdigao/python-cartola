@@ -20,6 +20,7 @@ class ScoreSchema(ma.SQLAlchemyAutoSchema):
         ordered = True
 
     value = fields.Decimal(as_string=True, required=True)
+    cartoletas = fields.Decimal(as_string=True, required=True)
 
     team = ma.Nested(
         "TeamSchema",
