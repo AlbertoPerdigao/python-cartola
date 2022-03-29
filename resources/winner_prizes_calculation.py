@@ -11,12 +11,12 @@ from models.winner import WinnerModel
 from resources.score import ScoreCartolaUpdate
 from resources.cartola_api import CartolaApi
 from resources.score import ScoreCartolaUpdate
-from app.messages import (    
+from app.messages import (
     ERROR_GETTING_OBJECT,
     ERROR_GETTING_OBJECTS,
     ERROR_INSERTING_OBJECT,
     ERROR_UPDATING_OBJECT,
-    ERROR_DELETING_OBJECT,    
+    ERROR_DELETING_OBJECT,
 )
 
 RODADA_PREMIADA_PRIZE = "Rodada Premiada"
@@ -30,11 +30,15 @@ FIRST_PLACE_PERCENTAGE = 50
 FIRST_PLACE_PERCENTAGE_UNLOCKED_4TH_PLACE = 40
 FOURTH_PLACE_PERCENTAGE = 0
 FOURTH_PLACE_PERCENTAGE_UNLOCKED_4TH_PLACE = 10
+PATRIMONIO_FIRST_PLACE_PERCENTAGE = 3.33
+PATRIMONIO_FIRST_PLACE_PERCENTAGE_UNLOCKED_2TH_PLACE = 2
+PATRIMONIO_SECOND_PLACE_PERCENTAGE = 0
+PATRIMONIO_SECOND_PLACE_PERCENTAGE_UNLOCKED_2TH_PLACE = 1.33
 
 
 class WinnerPrizesCalculation(Resource):
     @classmethod
-    def get(cls):        
+    def get(cls):
         # Calculates the winners and prizes of the current month/year for each type of award
 
         # Finds the current month by the round_number and current year
@@ -47,7 +51,7 @@ class WinnerPrizesCalculation(Resource):
             )
         )
         ### remove this code snippet when Cartola API is working
-        current_round_number = 3        
+        current_round_number = 3
         print("year: {}, round: {}".format(current_year, current_round_number))
         ###
 
@@ -57,7 +61,7 @@ class WinnerPrizesCalculation(Resource):
         # Campeonato Prize
         cls.__calculates_campeonato_prize_winners(current_year)
 
-        # Turno Prize        
+        # Turno Prize
         cls.__calculates_turno_prize_winners(current_round_number, current_year)
 
         # Mês, Rodada Premiada and Copa da Liga prizes
@@ -70,7 +74,7 @@ class WinnerPrizesCalculation(Resource):
 
         if not current_month:
             return {"message": ERROR_GETTING_OBJECT.format("Month")}, 500
-        
+
         # Gets the current month's payment amount
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
@@ -80,6 +84,8 @@ class WinnerPrizesCalculation(Resource):
         total_payments_amount = 0
         for payment in payments:
             total_payments_amount += payment.amount
+
+        unlock_2nd_or_4th_place = True if len(payments) >= TOTAL_PAYMENTS_TO_UNLOCK_4TH_PLACE else False
 
         for prize in current_month.prizes:
             if safe_str_cmp(prize.name, MES_PRIZE):
@@ -93,84 +99,113 @@ class WinnerPrizesCalculation(Resource):
             ):
                 cls.__calculates_rodada_premiada_prize_winners(
                     current_month, total_payments_amount, prize
-                )            
+                )
             elif safe_str_cmp(prize.name, COPA_DA_LIGA_PRIZE):
-                print("\nPrize:{}".format(COPA_DA_LIGA_PRIZE)) 
+                print("\nPrize:{}".format(COPA_DA_LIGA_PRIZE))
 
-        # Patrimônio Prize        
-        for prize in current_month.prizes:            
-            if safe_str_cmp(prize.name, PATRIMONIO_PRIZE):                
-                cls.__calculates_patrimonio_prize_winners(current_month, total_payments_amount, prize)
-        
+        # Patrimônio Prize
+        for prize in current_month.prizes:
+            if safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
+                cls.__calculates_patrimonio_prize_winners(
+                    current_month, total_payments_amount, prize, current_round_number, unlock_2nd_or_4th_place
+                )
+
         return {"message": "Automatic prizes calculation finished with success!"}
 
     @classmethod
-    def __calculates_patrimonio_prize_winners(cls, current_month: MonthModel, total_payments_amount: Decimal, prize: PrizeModel) -> None:
+    def __calculates_patrimonio_prize_winners(
+        cls,
+        current_month: MonthModel,
+        total_payments_amount: Decimal,
+        prize: PrizeModel,
+        current_round_number: int,
+        unlock_2nd_place: bool
+    ) -> None:
         print("\nPrize: {} - Month: {}".format(PATRIMONIO_PRIZE, current_month.id))
 
-        # The winners will be those who have the highest number of cartoletas and 
+        # The winners will be those who have the highest number of cartoletas and
         # who have not won another prize in the current month
-        
-        # Gets the teams scores and cartoletas of the month 
+
+        # Gets the teams scores and cartoletas of the month
         try:
-            sorted_team_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
             month_scores = ScoreModel.find_all_by_months_id(current_month.id)
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
-        if not sorted_team_scores or not month_scores:
+        if not month_scores:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
         # Calculates the team's patrimony
-        # The calculation consists of taking the difference between the 
+        # The calculation consists of taking the difference between the
         # number of cartoletas from the first and the last rounds of the month
-        #teams_patrimony = dict()        
-        #for month_score in month_scores:            
-        #    if month_score.round.round_number in teams_patrimony.keys():                
-        #        teams_patrimony.setdefault(month_score.round.round_number, []).append(month_score)
-        #    else:                
-        #        teams_patrimony[month_score.round.round_number] = []
+
         round_numbers = []
         for month_score in month_scores:
             round_numbers.append(month_score.round.round_number)
-        round_numbers = sorted(round_numbers)        
+        round_numbers = sorted(round_numbers)
         first_round = round_numbers[0]
         last_round = round_numbers[-1]
-        
+
         teams_patrimony = {}
         for month_score in month_scores:
             if month_score.round.round_number == first_round:
                 teams_patrimony[month_score.teams_id] = month_score.cartoletas
-        for month_score in month_scores:    
+        for month_score in month_scores:
             if month_score.round.round_number == last_round:
-                teams_patrimony[month_score.teams_id] = month_score.cartoletas - teams_patrimony[month_score.teams_id]
-        
-        sorted_teams_patrimony = sorted(teams_patrimony.items(), key=lambda item: item[1], reverse=True)
-        print(sorted_teams_patrimony)
+                teams_patrimony[month_score.teams_id] = (
+                    month_score.cartoletas - teams_patrimony[month_score.teams_id]
+                )
 
+        sorted_teams_patrimony = sorted(
+            teams_patrimony.items(), key=lambda item: item[1], reverse=True
+        )        
 
+        # Gets the teams who already have a prize in the current month
+        try:
+            all_prizes_winners = WinnerModel.find_all_by_months_id(current_month.id)
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format("Winner")}, 500
 
-        #cls.__updates_prize_places_percentage(unlock_4th_place, prize)
+        # This code below is necessary to withdraw the partial winners of the Turno and Campeonato prizes
+        awarded_teams_ids = set()
+        for winner in all_prizes_winners:
+            if (
+                safe_str_cmp(winner.prize.name, CAMPEONATO_PRIZE)
+                or safe_str_cmp(winner.prize.name, TURNO_PRIZE)
+            ) and winner.prize.round.round_number != current_round_number:
+                break
+            awarded_teams_ids.add(winner.teams_id)
 
-        total_prize_value = (
+        patrimony_winners = []
+        for team in sorted_teams_patrimony:
+            if team[0] in awarded_teams_ids:
+                continue
+            patrimony_winners.append(team)
+            if len(patrimony_winners) == 2:
+                break
+
+        cls.__updates_prize_places_percentage(unlock_2nd_place, prize)
+        print(total_payments_amount)        
+        total_prize_value = round(
             (prize.total_prize_percentage * total_payments_amount) / 100
-        ).quantize(Decimal(".01"))
+        )
+        print(total_prize_value)
+        sorted_scores = []
+        for patrimony_winner in patrimony_winners:
+            score = ScoreModel()
+            score.teams_id = patrimony_winner[0]
+            sorted_scores.append(score)
 
-
-        # Gets the winners of the month
-        
-
+        cls.__updates_winners(prize, sorted_scores, total_prize_value)        
 
     @classmethod
-    def __calculates_campeonato_prize_winners(
-        cls, current_year: int
-    ) -> None:
+    def __calculates_campeonato_prize_winners(cls, current_year: int) -> None:
         print("\nPrize: {} - Year: {}".format(CAMPEONATO_PRIZE, current_year))
 
         # The winners will be those who have the highest number of points in the year
-                
+
         # Gets the amount of payments of the year
-        total_payments_amount = 0        
+        total_payments_amount = 0
         try:
             payments = PaymentModel.find_all_by_year(current_year)
         except:
@@ -180,14 +215,17 @@ class WinnerPrizesCalculation(Resource):
         for payment in payments:
             total_payments_amount += payment.amount
             total_month_payments.append(payment.months_id)
-     
+
         unique_months_ids = list(set(total_month_payments))
         unlock_4th_place = True
         for unique_month_id in unique_months_ids:
-            if total_month_payments.count(unique_month_id) < TOTAL_PAYMENTS_TO_UNLOCK_4TH_PLACE:
+            if (
+                total_month_payments.count(unique_month_id)
+                < TOTAL_PAYMENTS_TO_UNLOCK_4TH_PLACE
+            ):
                 unlock_4th_place = False
                 break
-        
+
         try:
             prizes = PrizeModel.find_by_name(CAMPEONATO_PRIZE, current_year)
         except:
@@ -216,11 +254,15 @@ class WinnerPrizesCalculation(Resource):
 
     @classmethod
     def __calculates_turno_prize_winners(
-        cls,        
-        current_round_number: int,        
+        cls,
+        current_round_number: int,
         current_year: int,
-    ) -> None:                
-        print("\nPrize: {} - Shift: {}".format(TURNO_PRIZE, 1 if current_round_number <= 19 else 2))
+    ) -> None:
+        print(
+            "\nPrize: {} - Shift: {}".format(
+                TURNO_PRIZE, 1 if current_round_number <= 19 else 2
+            )
+        )
 
         # The winners will be those who have the highest number of points in the current shift
         # The shifts are divided in 2: shift 1 - round 1 to 19 and shift 2 - round 20 to 38
@@ -232,35 +274,38 @@ class WinnerPrizesCalculation(Resource):
             )
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("MonthModel")}, 500
-                
-        total_payments_amount = 0        
+
+        total_payments_amount = 0
         unlock_4th_place_list = list()
-        for month_id in months_ids:            
+        for month_id in months_ids:
             try:
                 payments = PaymentModel.find_all_by_months_id(month_id)
             except:
                 return {"message": ERROR_GETTING_OBJECTS.format("Payments")}, 500
 
             for payment in payments:
-                total_payments_amount += payment.amount                
-                
-            unlock_4th_place_list.append(True if len(payments) >= TOTAL_PAYMENTS_TO_UNLOCK_4TH_PLACE else False)        
-            unlock_4th_place = False if False in unlock_4th_place_list else True                
+                total_payments_amount += payment.amount
+
+            unlock_4th_place_list.append(
+                True if len(payments) >= TOTAL_PAYMENTS_TO_UNLOCK_4TH_PLACE else False
+            )
+            unlock_4th_place = False if False in unlock_4th_place_list else True
 
         # Gets the prize
         try:
             turno_prizes = PrizeModel.find_by_name(TURNO_PRIZE, current_year)
         except:
             return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
-                
+
         for turno_prize in turno_prizes:
-            if (turno_prize.round.round_number == 19 and current_round_number <= 19
+            if (
+                turno_prize.round.round_number == 19 and current_round_number <= 19
             ) or (turno_prize.round.round_number == 38 and current_round_number > 19):
                 prize = turno_prize
 
         if not prize:
             return {"message": ERROR_GETTING_OBJECT.format("Prize")}, 500
-        
+
         cls.__updates_prize_places_percentage(unlock_4th_place, prize)
 
         total_prize_value = (
@@ -269,9 +314,7 @@ class WinnerPrizesCalculation(Resource):
 
         # Gets the scores of the shift
         try:
-            sorted_scores = ScoreModel.sum_teams_scores_by_list_months_id(
-                months_ids
-            )
+            sorted_scores = ScoreModel.sum_teams_scores_by_list_months_id(months_ids)
         except:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
@@ -356,29 +399,33 @@ class WinnerPrizesCalculation(Resource):
         sorted_scores: List[ScoreModel],
         total_prize_value: Decimal,
     ) -> None:
-
+        
         # Deletes the winners by the type of prize if they exists
         try:
             winners_to_delete = WinnerModel.find_by_prizes_id(prize.id)
         except:
             return {"message": ERROR_GETTING_OBJECT.format("Winner")}, 500
 
-        first_object = True
-        for winner_to_delete in winners_to_delete:
-            try:
-                winner_to_delete.delete_from_db()
+        if not winners_to_delete:
+            try:                                
+                WinnerModel.reset_sequence(0)
             except:
-                return {"message": ERROR_DELETING_OBJECT.format("Winner")}, 500
-
-            if first_object:
-                first_object = False
+                return {"message": ERROR_UPDATING_OBJECT.format("Winner")}, 500
+        else:
+            first_object = True
+            for winner_to_delete in winners_to_delete:
                 try:
-                    #print("reset sequence: {}".format(winner_to_delete.id))
-                    WinnerModel.reset_sequence(winner_to_delete.id)
+                    winner_to_delete.delete_from_db()
                 except:
-                    return {
-                        "message": ERROR_UPDATING_OBJECT.format("Winner")
-                    }, 500
+                    return {"message": ERROR_DELETING_OBJECT.format("Winner")}, 500
+
+                if first_object:
+                    first_object = False
+                    try:
+                        # print("reset sequence: {}".format(winner_to_delete.id))
+                        WinnerModel.reset_sequence(winner_to_delete.id)
+                    except:
+                        return {"message": ERROR_UPDATING_OBJECT.format("Winner")}, 500
 
         # Inserts the winners, their prize value according to the amount of people who paid the monthly fee, their places and prize type
         place = 1
@@ -420,14 +467,30 @@ class WinnerPrizesCalculation(Resource):
             place += 1
 
     @classmethod
-    def __updates_prize_places_percentage(cls, unlock_4th_place: bool, prize: PrizeModel) -> None:        
-        if unlock_4th_place:
-            prize.first_place_percentage = FIRST_PLACE_PERCENTAGE_UNLOCKED_4TH_PLACE
-            prize.fourth_place_percentage = FOURTH_PLACE_PERCENTAGE_UNLOCKED_4TH_PLACE
+    def __updates_prize_places_percentage(
+        cls, unlock_2nd_or_4th_places: bool, prize: PrizeModel
+    ) -> None:
+        if safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
+            if unlock_2nd_or_4th_places:
+                prize.first_place_percentage = (
+                    PATRIMONIO_FIRST_PLACE_PERCENTAGE_UNLOCKED_2TH_PLACE
+                )
+                prize.second_place_percentage = (
+                    PATRIMONIO_SECOND_PLACE_PERCENTAGE_UNLOCKED_2TH_PLACE
+                )
+            else:
+                prize.first_place_percentage = PATRIMONIO_FIRST_PLACE_PERCENTAGE
+                prize.second_place_percentage = PATRIMONIO_SECOND_PLACE_PERCENTAGE
         else:
-            prize.first_place_percentage = FIRST_PLACE_PERCENTAGE 
-            prize.fourth_place_percentage = FOURTH_PLACE_PERCENTAGE
-        
+            if unlock_2nd_or_4th_places:
+                prize.first_place_percentage = FIRST_PLACE_PERCENTAGE_UNLOCKED_4TH_PLACE
+                prize.fourth_place_percentage = (
+                    FOURTH_PLACE_PERCENTAGE_UNLOCKED_4TH_PLACE
+                )
+            else:
+                prize.first_place_percentage = FIRST_PLACE_PERCENTAGE
+                prize.fourth_place_percentage = FOURTH_PLACE_PERCENTAGE
+
         try:
             prize.save_to_db()
         except:

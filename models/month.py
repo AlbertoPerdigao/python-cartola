@@ -73,9 +73,9 @@ class MonthModel(TimeMixin, db.Model):
                 .group_by(MonthModel.id)
                 .all()
             )
-        
+
         months_ids_list = list()
-        for month in months:          
+        for month in months:
             months_ids_list.append(month.id)
 
         return months_ids_list

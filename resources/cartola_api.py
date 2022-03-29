@@ -3,9 +3,7 @@ import requests
 from app.messages import ERROR_GETTING_CARTOLA_STATUS, ERROR_GETTING_CARTOLA_TEAM_SCORE
 
 CARTOLA_STATUS_URI = "https://api.cartolafc.globo.com/mercado/status"
-CARTOLA_TEAM_SCORE_URI = (
-    "https://api.cartolafc.globo.com/time/slug/{}/{}"  # [slug do time]/[rodada]
-)
+CARTOLA_TEAM_SCORE_URI = "https://api.cartola.globo.com/time/id/{}"  # [team id_tag]
 
 
 class CartolaApi:

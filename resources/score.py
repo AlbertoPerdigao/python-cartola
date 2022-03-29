@@ -171,4 +171,6 @@ class ScoreCartolaUpdate:
             try:
                 score.save_to_db()
             except:
-                return {"message": ERROR_UPDATING_OBJECT.format(ScoreModel.__name__)}, 500
+                return {
+                    "message": ERROR_UPDATING_OBJECT.format(ScoreModel.__name__)
+                }, 500

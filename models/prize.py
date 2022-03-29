@@ -66,7 +66,9 @@ class PrizeModel(TimeMixin, db.Model):
         from models.month import MonthModel
 
         return (
-            cls.query.join(MonthModel).filter(MonthModel.year == year, cls.name == name).all()
+            cls.query.join(MonthModel)
+            .filter(MonthModel.year == year, cls.name == name)
+            .all()
         )
 
     @classmethod

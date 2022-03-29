@@ -30,10 +30,13 @@ class WinnerModel(TimeMixin, db.Model):
 
     @classmethod
     def reset_sequence(cls, id_sequence: int) -> None:
-        # sql = "SELECT (SELECT setval('scm_teste_python.winners_id_seq', id)) FROM scm_teste_python.winners ORDER BY id DESC LIMIT 1;"
-        sql = "SELECT setval('scm_teste_python.winners_id_seq', {}, FALSE);".format(
-            id_sequence
-        )
+
+        if (id_sequence == 0):
+            sql = "SELECT (SELECT setval('scm_teste_python.winners_id_seq', id)) FROM scm_teste_python.winners ORDER BY id DESC LIMIT 1;"
+        else:            
+            sql = "SELECT setval('scm_teste_python.winners_id_seq', {}, FALSE);".format(
+                id_sequence
+            )
         db.session.execute(sql)
 
     @classmethod
