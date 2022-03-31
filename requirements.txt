@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+Flask-RESTful
+Flask-JWT-Extended
+Flask-Migrate
+Flask-Marshmallow
+Marshmallow
+Marshmallow-SQLAlchemy
+SQLAlchemy
+psycopg2
+alembic
+requests
