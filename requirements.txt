@@ -10,3 +10,4 @@ SQLAlchemy
 psycopg2
 alembic
 requests
+uwsgi
