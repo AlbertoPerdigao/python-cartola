@@ -11,4 +11,4 @@ psycopg2
 alembic
 requests
 uwsgi
-Werkzeug
+Werkzeug=2.0.0
