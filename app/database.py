@@ -1,0 +1,5 @@
+HOST = ""
+DATABASE = ""
+PORT = 5432
+USER = ""
+PASSWORD = ""
