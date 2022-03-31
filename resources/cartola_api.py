@@ -15,12 +15,12 @@ class CartolaApi:
             return {"message": ERROR_GETTING_CARTOLA_STATUS}, 500
 
     @classmethod
-    def get_cartola_team_by_team_slug_round_number(
-        cls, team_slug: str, round_number: int
+    def get_cartola_team_by_team_id_tag(
+        cls, id_tag: int
     ) -> Dict:
         try:
             return requests.get(
-                CARTOLA_TEAM_SCORE_URI.format(team_slug, round_number)
+                CARTOLA_TEAM_SCORE_URI.format(id_tag)
             ).json()
         except:
             return {"message": ERROR_GETTING_CARTOLA_TEAM_SCORE}, 500

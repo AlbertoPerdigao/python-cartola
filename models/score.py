@@ -39,8 +39,8 @@ class ScoreModel(TimeMixin, db.Model):
         return cls.query.get(id)
 
     @classmethod
-    def find_by_team_slug_round_number_year(
-        cls, team_slug: int, round_number: int, year: int
+    def find_by_team_id_tag_round_number_year(
+        cls, team_id_tag: int, round_number: int, year: int
     ) -> "ScoreModel":
         from models.round import RoundModel
         from models.team import TeamModel
@@ -52,7 +52,7 @@ class ScoreModel(TimeMixin, db.Model):
             .join(TeamModel)
             .where(
                 RoundModel.round_number == round_number,
-                TeamModel.slug == team_slug,
+                TeamModel.id_tag == team_id_tag,
                 MonthModel.year == year,
             )
             .first()

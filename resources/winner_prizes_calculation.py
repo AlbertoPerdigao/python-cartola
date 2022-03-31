@@ -51,9 +51,10 @@ class WinnerPrizesCalculation(Resource):
             )
         )
         ### remove this code snippet when Cartola API is working
-        current_round_number = 3
-        print("year: {}, round: {}".format(current_year, current_round_number))
+        #current_round_number = 1        
         ###
+
+        print("YEAR: {}, ROUND: {}".format(current_year, current_round_number))
 
         # Updates the teams scores trough the current round an year
         ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)

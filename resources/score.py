@@ -139,19 +139,19 @@ class ScoreCartolaUpdate:
         # if the score is not already created for the current round, creates it
 
         for team in teams:
-            # cartola_team = CartolaApi.get_cartola_team_by_team_slug_round_number(team.slug, current_round_number)
+            # cartola_team = CartolaApi.get_cartola_team_by_team_id_tag(team.id_tag)
             # cartola_team_score_value = cartola_team["pontos"]
-            # cartola_team_score_cartoletas = cartola_team["cartoletas"]
+            # cartola_team_score_cartoletas = cartola_team["patrimonio"]
             ### remove this code snippet when Cartola API is working, replacing it with the 3 lines above
             import random, decimal
 
             cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))
-            cartola_team_score_cartoletas = decimal.Decimal(random.randrange(0, 120))
+            cartola_team_score_cartoletas = decimal.Decimal(random.randrange(0, 500))
             ###
 
             try:
-                score = ScoreModel.find_by_team_slug_round_number_year(
-                    team.slug, current_round_number, current_year
+                score = ScoreModel.find_by_team_id_tag_round_number_year(
+                    team.id_tag, current_round_number, current_year
                 )
             except:
                 return {
