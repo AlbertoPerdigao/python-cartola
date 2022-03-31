@@ -1,4 +1,3 @@
-from turtle import st
 from typing import List
 from models.time_mixin import TimeMixin
 from models.winner import WinnerModel
