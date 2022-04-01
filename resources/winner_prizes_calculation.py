@@ -57,7 +57,9 @@ class WinnerPrizesCalculation(Resource):
         ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)
 
         # Campeonato Prize
-        cls.__calculates_campeonato_prize_winners(current_year)
+        msg = cls.__calculates_campeonato_prize_winners(current_year)
+        if msg:
+            return msg
 
         # Turno Prize
         cls.__calculates_turno_prize_winners(current_round_number, current_year)
