@@ -57,14 +57,10 @@ class WinnerPrizesCalculation(Resource):
         ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)
 
         # Campeonato Prize
-        msg = cls.__calculates_campeonato_prize_winners(current_year)
-        if len(msg["message"]):
-            return msg
+        cls.__calculates_campeonato_prize_winners(current_year)
 
         # Turno Prize
-        msg = cls.__calculates_turno_prize_winners(current_round_number, current_year)
-        if len(msg["message"]):
-            return msg
+        cls.__calculates_turno_prize_winners(current_round_number, current_year)
 
         # Mês, Rodada Premiada and Copa da Liga prizes
         try:
