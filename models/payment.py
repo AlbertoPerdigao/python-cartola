@@ -43,11 +43,11 @@ class PaymentModel(TimeMixin, db.Model):
     @classmethod
     def find_all_by_year(cls, year: int) -> List["PaymentModel"]:
         from models.team import TeamModel
-
+        
         payments_list = (
             cls.query.join(MonthModel)
             .join(TeamModel)
-            .filter(MonthModel.year == year)
+            .where(MonthModel.year == year)
             .all()
         )
         return payments_list

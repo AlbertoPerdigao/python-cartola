@@ -50,10 +50,7 @@ class WinnerPrizesCalculation(Resource):
                 current_year, current_round_number
             )
         )
-        ### remove this code snippet when Cartola API is working
-        #current_round_number = 1        
-        ###
-
+       
         print("YEAR: {}, ROUND: {}".format(current_year, current_round_number))
 
         # Updates the teams scores trough the current round an year
@@ -186,11 +183,11 @@ class WinnerPrizesCalculation(Resource):
                 break
 
         cls.__updates_prize_places_percentage(unlock_2nd_place, prize)
-        print(total_payments_amount)        
+        
         total_prize_value = round(
             (prize.total_prize_percentage * total_payments_amount) / 100
         )
-        print(total_prize_value)
+        
         sorted_scores = []
         for patrimony_winner in patrimony_winners:
             score = ScoreModel()
