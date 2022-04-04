@@ -1,3 +1,4 @@
+from typing import Dict
 from flask_restful import Resource
 from flask import request
 from models.score import ScoreModel
@@ -19,7 +20,7 @@ from app.messages import (
 
 score_schema = ScoreSchema()
 score_list_schema = ScoreSchema(many=True)
-
+CARTOLA_STATUS = CartolaApi.get_cartola_status()
 
 class Score(Resource):
     @classmethod
@@ -110,9 +111,15 @@ class ScoreList(Resource):
         return {"scores": score_list_schema.dump(scores)}, 200
 
 
-class ScoreCartolaUpdate:
+class ScoreCartolaUpdate(Resource):
     @classmethod
-    def update_teams_scores(cls, current_round_number: int, current_year: int) -> None:
+    def get(cls):
+
+        # Updates the team's scores
+
+        current_year = CARTOLA_STATUS["temporada"]  # datetime.datetime.now().year
+        current_round_number = CARTOLA_STATUS["rodada_atual"]
+
         # Gets all teams
         try:
             teams = TeamModel.find_all()
@@ -174,3 +181,5 @@ class ScoreCartolaUpdate:
                 return {
                     "message": ERROR_UPDATING_OBJECT.format(ScoreModel.__name__)
                 }, 500
+        
+        return {"message": "Team's scores updated with success!"}
