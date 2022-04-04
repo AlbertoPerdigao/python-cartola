@@ -54,7 +54,7 @@ class WinnerPrizesCalculation(Resource):
         print("YEAR: {}, ROUND: {}".format(current_year, current_round_number))
 
         # Updates the teams scores trough the current round an year
-        ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)
+        #ScoreCartolaUpdate.update_teams_scores(current_round_number, current_year)
 
         # Campeonato Prize
         cls.__calculates_campeonato_prize_winners(current_year)        
