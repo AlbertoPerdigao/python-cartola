@@ -8,9 +8,7 @@ from models.prize import PrizeModel
 from models.score import ScoreModel
 from models.payment import PaymentModel
 from models.winner import WinnerModel
-from resources.score import ScoreCartolaUpdate
 from resources.cartola_api import CartolaApi
-from resources.score import ScoreCartolaUpdate
 from app.messages import (
     ERROR_GETTING_OBJECT,
     ERROR_GETTING_OBJECTS,
@@ -18,7 +16,8 @@ from app.messages import (
     ERROR_UPDATING_OBJECT,
     ERROR_DELETING_OBJECT,
     SUCCESS_MSG,
-    PRIZES_WINNERS_MSG
+    PRIZES_WINNERS_MSG,
+    NOT_AWARDED_ROUND
 )
 
 RODADA_PREMIADA_PRIZE = "Rodada Premiada"
@@ -40,7 +39,7 @@ CARTOLA_STATUS = CartolaApi.get_cartola_status()
 
 class WinnerPrizesCalculation(Resource):
     @classmethod
-    def gets_month_payments_prize_unlock_places(cls, prize_type: str, current_round_number: int, current_year: int):
+    def gets_month_payments_prize_unlock_places(cls, prize_name: str, current_round_number: int, current_year: int):
               
         # Mês, Rodada Premiada and Copa da Liga prizes
         try:
@@ -52,7 +51,7 @@ class WinnerPrizesCalculation(Resource):
 
         if not current_month:
             return {"message": ERROR_GETTING_OBJECT.format("Month")}, 500
-
+        
         # Gets the current month's payment amount
         try:
             payments = PaymentModel.find_all_by_months_id(current_month.id)
@@ -67,93 +66,16 @@ class WinnerPrizesCalculation(Resource):
 
         selected_prize = None
         for prize in current_month.prizes:
-            if safe_str_cmp(prize.name, prize_type):
-                cls.calculates_mes_prize_winners(
-                    current_month, total_payments_amount, prize
-                )
-            elif (
-                safe_str_cmp(prize.name, prize_type)
-                and prize.round.round_number == current_round_number
-                and prize.round.awarded
-            ):
-                cls.calculates_rodada_premiada_prize_winners(
-                    current_month, total_payments_amount, prize
-                )
-            elif safe_str_cmp(prize.name, prize_type):
+            if (prize.name == prize_name and prize_name == MES_PRIZE):
+                selected_prize = prize
+            elif prize.name == prize_name and prize_name == RODADA_PREMIADA_PRIZE:
+                if prize.round.round_number == current_round_number and prize.round.awarded:
+                    selected_prize = prize                
+            elif prize.name == prize_name and prize_name == COPA_DA_LIGA_PRIZE:
                 print("\nPrize:{}".format(COPA_DA_LIGA_PRIZE))
 
-        return current_month, total_payments_amount, prize, unlock_2nd_or_4th_place
-
-        
-    @classmethod
-    def calculates_rodada_premiada_prize_winners(
-        cls,
-        current_month: MonthModel,
-        total_payments_amount: Decimal,
-        prize: PrizeModel,
-    ) -> None:
-
-        print(
-            "\nPrize: {} - Month: {} - Round: {}".format(
-                prize.name, current_month.id, prize.round.round_number
-            )
-        )
-
-        # The winners will be those who have the highest number of points in the current awarded round of the month
-
-        # Gets the number of awarded rounds in the month
-        awarded_rounds = 0
-        for round in current_month.rounds:
-            if round.awarded:
-                awarded_rounds += 1
-
-        month_prize_value = (
-            (prize.total_prize_percentage * total_payments_amount) / 100
-        ).quantize(Decimal(".01"))
-        round_prize_value = (month_prize_value / awarded_rounds).quantize(
-            Decimal(".01")
-        )
-
-        # Get the scores of the round
-        try:
-            scores = ScoreModel.find_by_rounds_id(prize.round.round_number)
-        except:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-
-        if not scores:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-
-        sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
-
-        cls.updates_winners(prize, sorted_scores, round_prize_value)
-
-    @classmethod
-    def calculates_mes_prize_winners(
-        cls,
-        current_month: MonthModel,
-        total_payments_amount: Decimal,
-        prize: PrizeModel,
-    ) -> None:
-
-        print("\nPrize: {} - Month: {}".format(prize.name, current_month.id))
-
-        # The winners will be those who have the highest sum of points from the rounds of the month
-
-        total_prize_value = (
-            (prize.total_prize_percentage * total_payments_amount) / 100
-        ).quantize(Decimal(".01"))
-
-        # Gets the scores of the month
-        try:
-            sorted_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
-        except:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-
-        if not sorted_scores:
-            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
-
-        cls.updates_winners(prize, sorted_scores, total_prize_value)
-
+        return current_month, total_payments_amount, selected_prize, unlock_2nd_or_4th_place
+    
     @classmethod
     def updates_winners(
         cls,
@@ -537,6 +459,10 @@ class WinnerMesCalculation(Resource):
             (prize.total_prize_percentage * total_payments_amount) / 100
         ).quantize(Decimal(".01"))
 
+        msg = WinnerPrizesCalculation.updates_prize_places_percentage(unlock_4th_place, prize)
+        if (msg[0]["message"] != SUCCESS_MSG):
+            return msg
+
         # Gets the scores of the month
         try:
             sorted_scores = ScoreModel.sum_teams_scores_by_months_id(current_month.id)
@@ -546,4 +472,70 @@ class WinnerMesCalculation(Resource):
         if not sorted_scores:
             return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
 
-        cls.updates_winners(prize, sorted_scores, total_prize_value)
+        msg = WinnerPrizesCalculation.updates_winners(prize, sorted_scores, total_prize_value)
+        if (msg[0]["message"] != SUCCESS_MSG):
+            return msg
+        
+        return {"message": PRIZES_WINNERS_MSG.format(MES_PRIZE)}
+
+
+class WinnerRodadaPremiadaCalculation(Resource):
+    def get(cls):                
+        current_year = CARTOLA_STATUS["temporada"]
+        current_round_number = CARTOLA_STATUS["rodada_atual"]
+
+        current_month, total_payments_amount, prize, unlock_4th_place = WinnerPrizesCalculation.gets_month_payments_prize_unlock_places(RODADA_PREMIADA_PRIZE, current_round_number, current_year)
+        print(prize)
+        if not prize.rounds_id:
+            return {"message": NOT_AWARDED_ROUND}
+
+        print(
+            "\nPrize: {} - Month: {} - Round: {} - Awarded: {}".format(
+                prize.name, current_month.name, prize.round.round_number, prize.round.awarded
+            )
+        )
+
+        # The winners will be those who have the highest number of points in the current awarded round of the month
+
+        # Gets the number of awarded rounds in the month
+        awarded_rounds = 0
+        for round in current_month.rounds:
+            if round.awarded:
+                awarded_rounds += 1
+
+        month_prize_value = (
+            (prize.total_prize_percentage * total_payments_amount) / 100
+        ).quantize(Decimal(".01"))
+        round_prize_value = (month_prize_value / awarded_rounds).quantize(
+            Decimal(".01")
+        )
+
+        msg = WinnerPrizesCalculation.updates_prize_places_percentage(unlock_4th_place, prize)
+        if (msg[0]["message"] != SUCCESS_MSG):
+            return msg
+
+        # Get the scores of the round
+        try:
+            scores = ScoreModel.find_by_rounds_id(prize.rounds_id)
+        except:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        if not scores:
+            return {"message": ERROR_GETTING_OBJECTS.format("Score")}, 500
+
+        sorted_scores = sorted(scores, key=lambda s: s.value, reverse=True)
+
+        msg = WinnerPrizesCalculation.updates_winners(prize, sorted_scores, round_prize_value)
+        if (msg[0]["message"] != SUCCESS_MSG):
+            return msg
+
+        return {"message": PRIZES_WINNERS_MSG.format(RODADA_PREMIADA_PRIZE)}
+
+
+class WinnerCopaDaLigaCalculation(Resource):
+    def get(cls):                
+        current_year = CARTOLA_STATUS["temporada"]
+        current_round_number = CARTOLA_STATUS["rodada_atual"]
+
+        return {"message": "Calculation not implemented for this prize."}
+        #return {"message": PRIZES_WINNERS_MSG.format(COPA_DA_LIGA_PRIZE)}

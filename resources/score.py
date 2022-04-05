@@ -111,7 +111,7 @@ class ScoreList(Resource):
         return {"scores": score_list_schema.dump(scores)}, 200
 
 
-class ScoreCartolaUpdate(Resource):
+class ScoreUpdateTeams(Resource):
     @classmethod
     def get(cls):
 
