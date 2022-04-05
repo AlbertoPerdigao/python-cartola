@@ -14,11 +14,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/teams",
+							"raw": "{{heroku_url}}/teams",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"teams"
 							]
@@ -32,14 +31,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/team/20",
+							"raw": "{{heroku_url}}/team/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"team",
-								"20"
+								"1"
 							]
 						}
 					},
@@ -74,14 +72,13 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \r\n    \"name\": \"TESTE\",\r\n    \"active\": true,\r\n    \"slug\": \"perdicartola-fbpa\",\r\n    \"id_tag\": \"189453\",\r\n    \"url_escudo_png\": \"https://s2.glbimg.com/D2BjIaq_nriJOo82prUmw-DHtG4=/https://s3.glbimg.com/v1/AUTH_58d78b787ec34892b5aaa0c7a146155f/cartola_svg_185/escudo/f6/50/26/00151931e3-86f4-49ed-b201-bd9416a02af620210429105026\",\r\n    \"player_name\": \"Alberto Perdigão\"    \r\n}"
+							"raw": "{    \r\n    \"name\": \"TESTE\",\r\n    \"active\": true,\r\n    \"slug\": \"perdicartola-fbpa\",\r\n    \"id_tag\": \"189453\",\r\n    \"url_escudo_png\": \"https://s2.glbimg.com/D2BjIaq_nriJOo82prUmw-DHtG4=/https://s3.glbimg.com/v1/AUTH_58d78b787ec34892b5aaa0c7a146155f/cartola_svg_185/escudo/f6/50/26/00151931e3-86f4-49ed-b201-bd9416a02af620210429105026\",\r\n    \"player_name\": \"Alberto Perdigão\"    \r\n}\r\n"
 						},
 						"url": {
-							"raw": "localhost:5000/team/0",
+							"raw": "{{heroku_url}}/team/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"team",
 								"0"
@@ -122,14 +119,13 @@
 							"raw": "{   \r\n    \"active\": false,\r\n    \"name\": \"TESTE 2\"\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/team/30",
+							"raw": "{{heroku_url}}/team/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"team",
-								"30"
+								"1"
 							]
 						}
 					},
@@ -141,14 +137,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/team/30",
+							"raw": "{{heroku_url}}/team/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"team",
-								"30"
+								"1"
 							]
 						}
 					},
@@ -181,11 +176,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/months/2022",
+							"raw": "{{heroku_url}}/months/2022",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"months",
 								"2022"
@@ -200,11 +194,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/month/1",
+							"raw": "{{heroku_url}}/month/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"month",
 								"1"
@@ -242,14 +235,13 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \r\n    \"name\": \"novembro\",\r\n    \"year\": 2022,\r\n    \"tax\": 30.00\r\n}"
+							"raw": "{    \r\n    \"name\": \"teste\",\r\n    \"year\": 2022,\r\n    \"tax\": 30.00\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/month/0",
+							"raw": "{{heroku_url}}/month/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"month",
 								"0"
@@ -290,14 +282,13 @@
 							"raw": "{   \r\n    \"name\": \"novembro\",\r\n    \"year\": 2022,\r\n    \"tax\": 30.00\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/month/8",
+							"raw": "{{heroku_url}}/month/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"month",
-								"8"
+								"1"
 							]
 						}
 					},
@@ -309,14 +300,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/month/9",
+							"raw": "{{heroku_url}}/month/2",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"month",
-								"9"
+								"2"
 							]
 						}
 					},
@@ -349,11 +339,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/rounds/2022",
+							"raw": "{{heroku_url}}/rounds/2022",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"rounds",
 								"2022"
@@ -384,11 +373,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/round/1",
+							"raw": "{{heroku_url}}/round/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"round",
 								"1"
@@ -426,14 +414,13 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \r\n    \"months_id\": 8,\r\n    \"round_number\": 39,\r\n    \"awarded\": true\r\n}"
+							"raw": "{    \r\n    \"months_id\": 2,\r\n    \"round_number\": 1,\r\n    \"awarded\": true\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/round/0",
+							"raw": "{{heroku_url}}/round/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"round",
 								"0"
@@ -474,14 +461,13 @@
 							"raw": "{   \r\n    \"months_id\": 1,\r\n    \"awarded\": true\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/round/3",
+							"raw": "{{heroku_url}}/round/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"round",
-								"3"
+								"1"
 							]
 						}
 					},
@@ -493,14 +479,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/round/40",
+							"raw": "{{heroku_url}}/round/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"round",
-								"40"
+								"1"
 							]
 						}
 					},
@@ -533,11 +518,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/payments/2022",
+							"raw": "{{heroku_url}}/payments/2022",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"payments",
 								"2022"
@@ -568,11 +552,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/payment/1",
+							"raw": "{{heroku_url}}/payment/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"payment",
 								"1"
@@ -610,14 +593,13 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{   \r\n    \"teams_id\": 29,\r\n    \"months_id\": 1,\r\n    \"amount\": 30.00\r\n}"
+							"raw": "{   \r\n    \"teams_id\": 28,\r\n    \"months_id\": 1,\r\n    \"amount\": 30.00\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/payment/0",
+							"raw": "{{heroku_url}}/payment/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"payment",
 								"0"
@@ -658,11 +640,10 @@
 							"raw": "{   \r\n    \"amount\": 10.00\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/payment/1",
+							"raw": "{{heroku_url}}/payment/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"payment",
 								"1"
@@ -677,14 +658,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/payment/7",
+							"raw": "{{heroku_url}}/payment/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"payment",
-								"7"
+								"1"
 							]
 						}
 					},
@@ -717,11 +697,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/prizes/2022",
+							"raw": "{{heroku_url}}/prizes/2022",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"prizes",
 								"2022"
@@ -736,14 +715,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/prize/9",
+							"raw": "{{heroku_url}}/prize/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"prize",
-								"9"
+								"1"
 							]
 						}
 					},
@@ -781,11 +759,10 @@
 							"raw": "{    \r\n    \"name\": \"Teste\",\r\n    \"total_prize_percentage\": 50,\r\n    \"first_place_percentage\": 30,\r\n    \"second_place_percentage\": 30,\r\n    \"tird_place_percentage\": 30,\r\n    \"fourth_place_percentage\": 30,\r\n    \"months_id\": 8\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/prize/0",
+							"raw": "{{heroku_url}}/prize/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"prize",
 								"0"
@@ -826,14 +803,13 @@
 							"raw": "{   \r\n    \"name\": \"Teste2\",\r\n    \"total_prize_percentage\": 50,\r\n    \"first_place_percentage\": 80,\r\n    \"second_place_percentage\": 40,\r\n    \"tird_place_percentage\": 10,\r\n    \"fourth_place_percentage\": 1\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/prize/37",
+							"raw": "{{heroku_url}}/prize/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"prize",
-								"37"
+								"1"
 							]
 						}
 					},
@@ -845,14 +821,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/prize/37",
+							"raw": "{{heroku_url}}/prize/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"prize",
-								"37"
+								"1"
 							]
 						}
 					},
@@ -885,11 +860,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/winners/2022",
+							"raw": "{{heroku_url}}/winners/2022",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"winners",
 								"2022"
@@ -904,11 +878,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/winner/1",
+							"raw": "{{heroku_url}}/winner/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"winner",
 								"1"
@@ -918,19 +891,108 @@
 					"response": []
 				},
 				{
-					"name": "/winners/auto_prizes_calculation",
+					"name": "/winners/rodada_premiada_calculation",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/winners/auto_prizes_calculation",
+							"raw": "{{heroku_url}}/winners/rodada_premiada_calculation",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"winners",
-								"auto_prizes_calculation"
+								"rodada_premiada_calculation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winners/campeonato_calculation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{heroku_url}}/winners/campeonato_calculation",
+							"host": [
+								"{{heroku_url}}"
+							],
+							"path": [
+								"winners",
+								"campeonato_calculation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winners/turno_calculation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{heroku_url}}/winners/turno_calculation",
+							"host": [
+								"{{heroku_url}}"
+							],
+							"path": [
+								"winners",
+								"turno_calculation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winners/patrimonio_calculation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{heroku_url}}/winners/patrimonio_calculation",
+							"host": [
+								"{{heroku_url}}"
+							],
+							"path": [
+								"winners",
+								"patrimonio_calculation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winners/mes_calculation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{heroku_url}}/winners/mes_calculation",
+							"host": [
+								"{{heroku_url}}"
+							],
+							"path": [
+								"winners",
+								"mes_calculation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/winners/copa_da_liga_calculation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{heroku_url}}/winners/copa_da_liga_calculation",
+							"host": [
+								"{{heroku_url}}"
+							],
+							"path": [
+								"winners",
+								"copa_da_liga_calculation"
 							]
 						}
 					},
@@ -968,11 +1030,10 @@
 							"raw": "{    \r\n    \"teams_id\": \"20\",\r\n    \"prizes_id\": 1,\r\n    \"place\": 1,\r\n    \"prize_value\": 73.50\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/winner/0",
+							"raw": "{{heroku_url}}/winner/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"winner",
 								"0"
@@ -1013,11 +1074,10 @@
 							"raw": "{   \r\n    \"place\": 1,\r\n    \"prize_value\": 70.15\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/winner/1",
+							"raw": "{{heroku_url}}/winner/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"winner",
 								"1"
@@ -1032,11 +1092,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/winner/2",
+							"raw": "{{heroku_url}}/winner/2",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"winner",
 								"2"
@@ -1072,14 +1131,47 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/scores/2022",
+							"raw": "{{heroku_url}}/scores/2022",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"scores",
 								"2022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/scores/update_teams_scores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{heroku_url}}/scores/update_teams_scores",
+							"host": [
+								"{{heroku_url}}"
+							],
+							"path": [
+								"scores",
+								"update_teams_scores"
 							]
 						}
 					},
@@ -1091,11 +1183,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/score/1",
+							"raw": "{{heroku_url}}/score/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"score",
 								"1"
@@ -1136,11 +1227,10 @@
 							"raw": "{    \r\n    \"points\": 116.20,    \r\n    \"rounds_id\": 1,\r\n    \"teams_id\": 28\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/score/0",
+							"raw": "{{heroku_url}}/score/0",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"score",
 								"0"
@@ -1181,11 +1271,10 @@
 							"raw": "{   \r\n    \"name\": \"Teste2\",\r\n    \"total_prize_percentage\": 50,\r\n    \"first_place_percentage\": 80,\r\n    \"second_place_percentage\": 40,\r\n    \"tird_place_percentage\": 10,\r\n    \"fourth_place_percentage\": 1\r\n}"
 						},
 						"url": {
-							"raw": "localhost:5000/score/1",
+							"raw": "{{heroku_url}}/score/1",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"score",
 								"1"
@@ -1200,11 +1289,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:5000/prize/37",
+							"raw": "{{heroku_url}}/prize/37",
 							"host": [
-								"localhost"
+								"{{heroku_url}}"
 							],
-							"port": "5000",
 							"path": [
 								"prize",
 								"37"
