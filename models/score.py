@@ -125,8 +125,7 @@ class ScoreModel(TimeMixin, db.Model):
     @classmethod
     def sum_teams_scores_by_year(cls, year: int) -> List["ScoreModel"]:
         from models.round import RoundModel
-        from sqlalchemy.sql import func, desc
-
+        
         scores = (
             db.session.query(func.sum(cls.value).label("value"), cls.teams_id)
             .join(RoundModel)
