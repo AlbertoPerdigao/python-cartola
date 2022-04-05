@@ -358,7 +358,6 @@ class WinnerPatrimonioCalculation(Resource):
         for prize in current_month.prizes:
             if safe_str_cmp(prize.name, PATRIMONIO_PRIZE):
                 patrimonio_prize = prize
-                
         
         print("\nPrize: {} - Month: {}".format(PATRIMONIO_PRIZE, current_month.id))
 
@@ -376,7 +375,7 @@ class WinnerPatrimonioCalculation(Resource):
 
         # Calculates the team's patrimony
         # The calculation consists of taking the difference between the
-        # number of cartoletas from the first and the last rounds of the month
+        # number of cartoletas from the last and the first rounds of the month
 
         round_numbers = []
         for month_score in month_scores:
@@ -397,7 +396,7 @@ class WinnerPatrimonioCalculation(Resource):
 
         sorted_teams_patrimony = sorted(
             teams_patrimony.items(), key=lambda item: item[1], reverse=True
-        )        
+        )
 
         # Gets the teams who already have a prize in the current month
         try:
@@ -408,10 +407,10 @@ class WinnerPatrimonioCalculation(Resource):
         # This code below is necessary to withdraw the partial winners of the Turno and Campeonato prizes
         awarded_teams_ids = set()
         for winner in all_prizes_winners:
-            if (
+            if ((
                 safe_str_cmp(winner.prize.name, CAMPEONATO_PRIZE)
-                or safe_str_cmp(winner.prize.name, TURNO_PRIZE)
-            ) and winner.prize.round.round_number != current_round_number:
+                or safe_str_cmp(winner.prize.name, TURNO_PRIZE)                
+            ) and winner.prize.round.round_number != current_round_number) or safe_str_cmp(winner.prize.name, PATRIMONIO_PRIZE):
                 break
             awarded_teams_ids.add(winner.teams_id)
 

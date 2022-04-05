@@ -1,7 +1,5 @@
-from decimal import Decimal
-from typing import Dict, List
-
-from flask import session
+from typing import List
+from sqlalchemy.sql import func, desc
 from models.month import MonthModel
 from models.time_mixin import TimeMixin
 from app import db
@@ -82,8 +80,7 @@ class ScoreModel(TimeMixin, db.Model):
 
     @classmethod
     def sum_teams_scores_by_months_id(cls, months_id: int) -> List["ScoreModel"]:
-        from models.round import RoundModel
-        from sqlalchemy.sql import func, desc
+        from models.round import RoundModel        
 
         scores = (
             db.session.query(func.sum(cls.value).label("value"), cls.teams_id)
@@ -107,8 +104,7 @@ class ScoreModel(TimeMixin, db.Model):
         cls, months_ids: List[int]
     ) -> List["ScoreModel"]:
         from models.round import RoundModel
-        from sqlalchemy.sql import func, desc
-
+        
         scores = (
             db.session.query(func.sum(cls.value).label("value"), cls.teams_id)
             .join(RoundModel)
