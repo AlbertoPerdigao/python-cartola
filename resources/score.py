@@ -118,7 +118,7 @@ class ScoreUpdateTeams(Resource):
         # Updates the team's scores
 
         current_year = CARTOLA_STATUS["temporada"]  # datetime.datetime.now().year
-        current_round_number = CARTOLA_STATUS["rodada_atual"]
+        current_round_number = 1 #CARTOLA_STATUS["rodada_atual"]
 
         # Gets all teams
         try:
@@ -146,14 +146,13 @@ class ScoreUpdateTeams(Resource):
         # if the score is not already created for the current round, creates it
 
         for team in teams:
-            # cartola_team = CartolaApi.get_cartola_team_by_team_id_tag(team.id_tag)
-            # cartola_team_score_value = cartola_team["pontos"]
-            # cartola_team_score_cartoletas = cartola_team["patrimonio"]
+            cartola_team = CartolaApi.get_cartola_team_by_team_id_tag(team.id_tag)
+            cartola_team_score_value = cartola_team["pontos"]
+            cartola_team_score_cartoletas = cartola_team["patrimonio"]
             ### remove this code snippet when Cartola API is working, replacing it with the 3 lines above
-            import random, decimal
-
-            cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))
-            cartola_team_score_cartoletas = decimal.Decimal(random.randrange(0, 500))
+            #import random, decimal
+            #cartola_team_score_value = decimal.Decimal(random.randrange(0, 120))
+            #cartola_team_score_cartoletas = decimal.Decimal(random.randrange(0, 500))
             ###
 
             try:
