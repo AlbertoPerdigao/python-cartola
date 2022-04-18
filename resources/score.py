@@ -118,7 +118,7 @@ class ScoreUpdateTeams(Resource):
         # Updates the team's scores
 
         current_year = CARTOLA_STATUS["temporada"]  # datetime.datetime.now().year
-        current_round_number = 1 #CARTOLA_STATUS["rodada_atual"]
+        current_round_number = CARTOLA_STATUS["rodada_atual"]
 
         # Gets all teams
         try:
